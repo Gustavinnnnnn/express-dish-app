@@ -159,7 +159,7 @@ const Carrinho = () => {
                   <img
                     src={it.product.image}
                     alt={it.product.name}
-                    className="h-20 w-20 rounded-xl object-cover"
+                    className="h-20 w-20 rounded-xl bg-background object-contain"
                   />
                   <div className="flex flex-1 flex-col gap-2 min-w-0">
                     <div className="flex items-start justify-between gap-2">

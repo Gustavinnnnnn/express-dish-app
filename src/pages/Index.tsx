@@ -57,7 +57,7 @@ const Index = () => {
           to={featuredOffer?.product_id ? `/produto/${featuredOffer.product_id}` : "/ofertas"}
           className="relative block overflow-hidden rounded-3xl shadow-card"
         >
-          <img src={heroImage} alt={heroTitle} className="h-56 w-full object-cover" />
+          <img src={heroImage} alt={heroTitle} className="max-h-72 w-full bg-card object-contain" />
           <div className="absolute inset-0 bg-gradient-hero" />
           <div className="absolute inset-x-0 bottom-0 p-5">
             <span className="inline-block rounded-full bg-primary/90 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">

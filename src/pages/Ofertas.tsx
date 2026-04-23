@@ -33,12 +33,12 @@ const Ofertas = () => {
               transition={{ delay: i * 0.05 }}
               className="relative overflow-hidden rounded-3xl bg-gradient-card shadow-card"
             >
-              <div className="relative h-44 w-full overflow-hidden">
+              <div className="relative w-full overflow-hidden bg-card">
                 <img
                   src={o.image_url || "/placeholder.svg"}
                   alt={o.title}
                   loading="lazy"
-                  className="h-full w-full object-cover"
+                  className="max-h-72 w-full object-contain"
                 />
                 <div className="absolute inset-0 bg-gradient-hero" />
                 {discount > 0 && (
