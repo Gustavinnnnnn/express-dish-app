@@ -1,0 +1,19 @@
+{
+  "name": "Flame Burger — Delivery",
+  "short_name": "Flame Burger",
+  "description": "Peça seus burgers favoritos direto da loja.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
+  "icons": [
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
