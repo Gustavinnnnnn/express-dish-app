@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Carrinho = () => {
+  const { settings } = useStoreData();
   const itemsMap = useCart((s) => s.items);
   const items = Object.values(itemsMap);
   const total = items.reduce((sum, it) => sum + it.unitPrice * it.qty, 0);
@@ -29,7 +30,7 @@ const Carrinho = () => {
     cartao: "Cartão na entrega",
   }[payment];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (items.length === 0) return;
 
     const lines: string[] = [];
