@@ -10,12 +10,12 @@ import { toast } from "sonner";
 const Carrinho = () => {
   const itemsMap = useCart((s) => s.items);
   const items = Object.values(itemsMap);
-  const total = items.reduce((sum, it) => sum + it.product.price * it.qty, 0);
+  const total = items.reduce((sum, it) => sum + it.unitPrice * it.qty, 0);
   const note = useCart((s) => s.note);
   const setNote = useCart((s) => s.setNote);
   const payment = useCart((s) => s.payment);
   const setPayment = useCart((s) => s.setPayment);
-  const add = useCart((s) => s.add);
+  const inc = useCart((s) => s.increment);
   const dec = useCart((s) => s.decrement);
   const remove = useCart((s) => s.remove);
   const clear = useCart((s) => s.clear);
@@ -30,18 +30,43 @@ const Carrinho = () => {
 
   const handleSend = () => {
     if (items.length === 0) return;
-    const lines = items.map(
-      (it) => `• ${it.qty}x ${it.product.name} — ${brl(it.product.price * it.qty)}`
-    );
+
+    const lines: string[] = [];
+    items.forEach((it) => {
+      lines.push(
+        `\n*${it.qty}x ${it.product.name}* — ${brl(it.unitPrice * it.qty)}`
+      );
+      if (it.extras.length) {
+        // Agrupa por groupTitle
+        const byGroup = it.extras.reduce<Record<string, typeof it.extras>>(
+          (acc, e) => {
+            (acc[e.groupTitle] ||= []).push(e);
+            return acc;
+          },
+          {}
+        );
+        Object.entries(byGroup).forEach(([gName, list]) => {
+          lines.push(`  _${gName}:_`);
+          list.forEach((e) => {
+            const priceTxt =
+              e.unitPrice > 0 ? ` (+${brl(e.unitPrice * e.qty)})` : "";
+            const qtyTxt = e.qty > 1 ? ` x${e.qty}` : "";
+            lines.push(`   • ${e.optionName}${qtyTxt}${priceTxt}`);
+          });
+        });
+      }
+      if (it.note) lines.push(`  _Obs.:_ ${it.note}`);
+    });
+
     const msg = [
-      `*Novo pedido — ${STORE.name}*`,
-      "",
+      `*Novo pedido — ${STORE.name}* 🍇`,
       ...lines,
       "",
       `*Total:* ${brl(total)}`,
       `*Pagamento:* ${paymentLabel}`,
-      note ? `*Obs.:* ${note}` : "",
+      note ? `*Observação geral:* ${note}` : "",
       profile.name ? `\n*Cliente:* ${profile.name}` : "",
+      profile.phone ? `*Telefone:* ${profile.phone}` : "",
       profile.address ? `*Endereço:* ${profile.address}` : "",
     ]
       .filter(Boolean)
@@ -58,6 +83,8 @@ const Carrinho = () => {
     clear();
   };
 
+  const totalQty = items.reduce((s, i) => s + i.qty, 0);
+
   return (
     <AppShell>
       <header className="safe-top px-5 pb-2 pt-4">
@@ -65,9 +92,7 @@ const Carrinho = () => {
         <p className="mt-0.5 text-sm text-muted-foreground">
           {items.length === 0
             ? "Vazio por enquanto"
-            : `${items.reduce((s, i) => s + i.qty, 0)} ${
-                items.reduce((s, i) => s + i.qty, 0) === 1 ? "item" : "itens"
-              }`}
+            : `${totalQty} ${totalQty === 1 ? "item" : "itens"}`}
         </p>
       </header>
 
@@ -80,23 +105,22 @@ const Carrinho = () => {
             Seu carrinho está vazio
           </h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Que tal um burger?
+            Que tal um açaí cremoso?
           </p>
           <Link
             to="/explorar"
             className="mt-6 rounded-full bg-gradient-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-glow"
           >
-            Explorar cardápio
+            Ver cardápio
           </Link>
         </div>
       ) : (
         <>
-          {/* Itens */}
           <section className="mt-3 flex flex-col gap-3 px-5">
             <AnimatePresence>
               {items.map((it) => (
                 <motion.div
-                  key={it.product.id}
+                  key={it.lineId}
                   layout
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -108,27 +132,49 @@ const Carrinho = () => {
                     alt={it.product.name}
                     className="h-20 w-20 rounded-xl object-cover"
                   />
-                  <div className="flex flex-1 flex-col justify-between">
+                  <div className="flex flex-1 flex-col gap-2 min-w-0">
                     <div className="flex items-start justify-between gap-2">
                       <h3 className="font-display text-sm font-semibold leading-tight">
                         {it.product.name}
                       </h3>
                       <button
-                        onClick={() => remove(it.product.id)}
+                        onClick={() => remove(it.lineId)}
                         aria-label="Remover"
-                        className="text-muted-foreground"
+                        className="flex-shrink-0 text-muted-foreground"
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
-                    <div className="flex items-center justify-between">
+
+                    {it.extras.length > 0 && (
+                      <ul className="text-[11px] leading-snug text-muted-foreground">
+                        {it.extras.map((e) => (
+                          <li key={e.optionId}>
+                            • {e.qty > 1 ? `${e.qty}x ` : ""}
+                            {e.optionName}
+                            {e.unitPrice > 0 && (
+                              <span className="text-primary">
+                                {" "}+ {brl(e.unitPrice * e.qty)}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    {it.note && (
+                      <p className="text-[11px] italic text-muted-foreground">
+                        “{it.note}”
+                      </p>
+                    )}
+
+                    <div className="mt-auto flex items-center justify-between">
                       <span className="font-display text-sm font-bold text-primary">
-                        {brl(it.product.price * it.qty)}
+                        {brl(it.unitPrice * it.qty)}
                       </span>
                       <div className="flex items-center gap-2 rounded-full bg-background px-1 py-1">
                         <button
-                          onClick={() => dec(it.product.id)}
-                          className="flex h-7 w-7 items-center justify-center rounded-full bg-card text-foreground active:scale-90"
+                          onClick={() => dec(it.lineId)}
+                          className="flex h-7 w-7 items-center justify-center rounded-full bg-card active:scale-90"
                           aria-label="Diminuir"
                         >
                           <Minus className="h-3.5 w-3.5" />
@@ -137,7 +183,7 @@ const Carrinho = () => {
                           {it.qty}
                         </span>
                         <button
-                          onClick={() => add(it.product)}
+                          onClick={() => inc(it.lineId)}
                           className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground active:scale-90"
                           aria-label="Aumentar"
                         >
@@ -151,21 +197,19 @@ const Carrinho = () => {
             </AnimatePresence>
           </section>
 
-          {/* Observação */}
           <section className="mt-5 px-5">
             <label className="mb-2 block font-display text-sm font-semibold">
-              Observação
+              Observação geral
             </label>
             <textarea
               value={note}
               onChange={(e) => setNote(e.target.value)}
-              placeholder="Ex: sem cebola, ponto da carne..."
+              placeholder="Ex: troco para R$ 50, deixar na portaria..."
               rows={2}
               className="w-full resize-none rounded-2xl bg-card p-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-primary"
             />
           </section>
 
-          {/* Pagamento */}
           <section className="mt-5 px-5">
             <label className="mb-2 block font-display text-sm font-semibold">
               Pagamento
@@ -189,7 +233,6 @@ const Carrinho = () => {
             </div>
           </section>
 
-          {/* Total + CTA */}
           <section className="mt-6 px-5">
             <div className="rounded-2xl bg-card p-4 shadow-card">
               <div className="flex items-center justify-between text-sm">

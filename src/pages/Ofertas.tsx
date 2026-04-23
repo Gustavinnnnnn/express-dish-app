@@ -1,37 +1,20 @@
 import { motion } from "framer-motion";
-import { Flame } from "lucide-react";
+import { Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
-import { offers, products } from "@/data/menu";
+import { offers } from "@/data/menu";
 import { brl } from "@/lib/format";
-import { useCart } from "@/store/cart";
-import { toast } from "sonner";
 
 const Ofertas = () => {
-  const add = useCart((s) => s.add);
-
-  const handlePick = (offerId: string) => {
-    // Simplificação: adiciona um produto representativo
-    const map: Record<string, string> = {
-      o1: "p2",
-      o2: "p3",
-      o3: "p1",
-    };
-    const prod = products.find((p) => p.id === map[offerId]);
-    if (prod) {
-      add(prod);
-      toast.success("Adicionado ao carrinho!");
-    }
-  };
-
   return (
     <AppShell>
       <header className="safe-top px-5 pb-2 pt-4">
         <div className="flex items-center gap-2">
-          <Flame className="h-6 w-6 text-primary" />
+          <Sparkles className="h-6 w-6 text-primary" />
           <h1 className="font-display text-2xl font-extrabold">Ofertas</h1>
         </div>
         <p className="mt-1 text-sm text-muted-foreground">
-          Combos com até 25% off — só hoje
+          Combos especiais — só hoje
         </p>
       </header>
 
@@ -75,12 +58,12 @@ const Ofertas = () => {
                     </span>
                   </div>
                 </div>
-                <button
-                  onClick={() => handlePick(o.id)}
+                <Link
+                  to={`/produto/${o.productId}`}
                   className="rounded-full bg-gradient-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-glow active:scale-95"
                 >
-                  Pedir
-                </button>
+                  Montar
+                </Link>
               </div>
             </motion.div>
           );

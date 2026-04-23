@@ -1,10 +1,9 @@
 import { motion } from "framer-motion";
-import { Flame, MapPin } from "lucide-react";
+import { Sparkles, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard, ProductChip } from "@/components/ProductCard";
-import { categories, products, STORE } from "@/data/menu";
-import heroBurger from "@/assets/hero-burger.jpg";
+import { categories, products, STORE, heroAcai } from "@/data/menu";
 
 const Index = () => {
   const popular = products.filter((p) => p.popular);
@@ -22,7 +21,7 @@ const Index = () => {
           </button>
         </div>
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-primary shadow-glow">
-          <Flame className="h-5 w-5 text-primary-foreground" />
+          <Sparkles className="h-5 w-5 text-primary-foreground" />
         </div>
       </header>
 
@@ -38,7 +37,7 @@ const Index = () => {
           className="relative block overflow-hidden rounded-3xl shadow-card"
         >
           <img
-            src={heroBurger}
+            src={heroAcai}
             alt="Promoção do dia"
             className="h-56 w-full object-cover"
           />
@@ -48,8 +47,8 @@ const Index = () => {
               Oferta do dia
             </span>
             <h2 className="mt-2 font-display text-2xl font-extrabold leading-tight">
-              Combo Bacon Lover<br />
-              <span className="text-primary-glow">por R$ 49,90</span>
+              Açaí 500ml + 2 extras<br />
+              <span className="text-primary-glow">por R$ 24,90</span>
             </h2>
             <button className="mt-3 rounded-full bg-gradient-primary px-5 py-2 text-sm font-semibold text-primary-foreground shadow-glow">
               Pedir agora
@@ -95,7 +94,7 @@ const Index = () => {
       </section>
 
       {/* Por categoria */}
-      {categories.slice(0, 2).map((cat) => {
+      {categories.map((cat) => {
         const list = byCategory(cat.id);
         if (!list.length) return null;
         return (

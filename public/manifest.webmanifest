@@ -1,13 +1,13 @@
 {
-  "name": "Flame Burger — Delivery",
-  "short_name": "Flame Burger",
-  "description": "Peça seus burgers favoritos direto da loja.",
+  "name": "Roxo Açaí — Delivery",
+  "short_name": "Roxo Açaí",
+  "description": "Peça seu açaí cremoso em poucos toques.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0f0f0f",
-  "theme_color": "#0f0f0f",
+  "background_color": "#16101e",
+  "theme_color": "#16101e",
   "icons": [
     {
       "src": "/icon-512.png",
