@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { useCart, useProfile } from "@/store/cart";
 import { brl } from "@/lib/format";
-import { STORE } from "@/data/menu";
+import { useStoreData } from "@/store/storeData";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Carrinho = () => {
