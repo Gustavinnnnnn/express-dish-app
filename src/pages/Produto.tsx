@@ -1,29 +1,44 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { ArrowLeft, Minus, Plus, Check } from "lucide-react";
 import { motion } from "framer-motion";
-import { products, type ExtraGroup, type ExtraOption } from "@/data/menu";
+import { supabase } from "@/integrations/supabase/client";
+import type { ExtraGroup, ExtraOption, Product } from "@/data/menu";
 import { brl } from "@/lib/format";
-import {
-  useCart,
-  computeUnitPrice,
-  type SelectedExtra,
-} from "@/store/cart";
+import { useCart, computeUnitPrice, type SelectedExtra } from "@/store/cart";
 import { toast } from "sonner";
 
-type Selection = Record<string, Record<string, number>>; // groupId -> optionId -> qty
+type Selection = Record<string, Record<string, number>>;
 
 const Produto = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const product = products.find((p) => p.id === id);
   const addLine = useCart((s) => s.addLine);
 
+  const [product, setProduct] = useState<Product | null>(null);
+  const [loading, setLoading] = useState(true);
   const [selection, setSelection] = useState<Selection>({});
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
 
-  // Lista plana de selecionados (calculada antes de qualquer early return p/ manter ordem dos hooks)
+  useEffect(() => {
+    if (!id) return;
+    supabase.from("products").select("*").eq("id", id).maybeSingle().then(({ data }) => {
+      if (data) {
+        setProduct({
+          id: data.id,
+          name: data.name,
+          description: data.description ?? "",
+          price: Number(data.price),
+          image: data.image_url || "/placeholder.svg",
+          category: data.category_id ?? "",
+          extras: (data.extras as any) || [],
+        });
+      }
+      setLoading(false);
+    });
+  }, [id]);
+
   const selectedExtras: SelectedExtra[] = useMemo(() => {
     if (!product?.extras) return [];
     const list: SelectedExtra[] = [];
@@ -33,12 +48,9 @@ const Produto = () => {
         const q = sel[opt.id] ?? 0;
         if (q > 0) {
           list.push({
-            groupId: g.id,
-            groupTitle: g.title,
-            optionId: opt.id,
-            optionName: opt.name,
-            qty: q,
-            unitPrice: opt.price,
+            groupId: g.id, groupTitle: g.title,
+            optionId: opt.id, optionName: opt.name,
+            qty: q, unitPrice: opt.price,
           });
         }
       }
@@ -46,14 +58,16 @@ const Produto = () => {
     return list;
   }, [selection, product]);
 
+  if (loading) {
+    return <div className="flex min-h-screen items-center justify-center"><p className="text-muted-foreground">Carregando...</p></div>;
+  }
+
   if (!product) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6 text-center">
         <div>
           <p className="text-muted-foreground">Produto não encontrado.</p>
-          <Link to="/explorar" className="mt-4 inline-block text-primary">
-            Voltar ao cardápio
-          </Link>
+          <Link to="/explorar" className="mt-4 inline-block text-primary">Voltar ao cardápio</Link>
         </div>
       </div>
     );
@@ -95,7 +109,6 @@ const Produto = () => {
   const unitPrice = computeUnitPrice(product, selectedExtras);
   const total = unitPrice * qty;
 
-  // Validação de obrigatórios
   const missingRequired = product.extras
     ? product.extras.filter((g) => g.required && groupTotal(g.id) === 0)
     : [];
@@ -105,26 +118,15 @@ const Produto = () => {
       toast.error(`Escolha: ${missingRequired.map((g) => g.title).join(", ")}`);
       return;
     }
-    addLine({
-      product,
-      qty,
-      extras: selectedExtras,
-      note: note.trim() || undefined,
-      unitPrice,
-    });
+    addLine({ product, qty, extras: selectedExtras, note: note.trim() || undefined, unitPrice });
     toast.success("Adicionado ao carrinho!");
     navigate("/carrinho");
   };
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-background pb-40">
-      {/* Hero */}
       <div className="relative">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="h-72 w-full object-cover"
-        />
+        <img src={product.image} alt={product.name} className="h-72 w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-hero" />
         <button
           onClick={() => navigate(-1)}
@@ -135,20 +137,12 @@ const Produto = () => {
         </button>
       </div>
 
-      {/* Title */}
       <header className="px-5 pt-5">
-        <h1 className="font-display text-2xl font-extrabold leading-tight">
-          {product.name}
-        </h1>
-        <p className="mt-1.5 text-sm text-muted-foreground">
-          {product.description}
-        </p>
-        <p className="mt-3 font-display text-xl font-bold text-primary">
-          {brl(product.price)}
-        </p>
+        <h1 className="font-display text-2xl font-extrabold leading-tight">{product.name}</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">{product.description}</p>
+        <p className="mt-3 font-display text-xl font-bold text-primary">{brl(product.price)}</p>
       </header>
 
-      {/* Grupos de extras */}
       {product.extras?.map((group) => (
         <ExtraGroupSection
           key={group.id}
@@ -160,7 +154,6 @@ const Produto = () => {
         />
       ))}
 
-      {/* Observação */}
       <section className="mt-6 px-5">
         <h3 className="mb-2 font-display text-base font-bold">Observação</h3>
         <textarea
@@ -172,7 +165,6 @@ const Produto = () => {
         />
       </section>
 
-      {/* Quantidade */}
       <section className="mt-6 flex items-center justify-between px-5">
         <span className="font-display text-base font-bold">Quantidade</span>
         <div className="flex items-center gap-3 rounded-full bg-card px-2 py-1.5">
@@ -183,9 +175,7 @@ const Produto = () => {
           >
             <Minus className="h-4 w-4" />
           </button>
-          <span className="w-6 text-center font-display text-lg font-bold">
-            {qty}
-          </span>
+          <span className="w-6 text-center font-display text-lg font-bold">{qty}</span>
           <button
             onClick={() => setQty((q) => q + 1)}
             className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-primary text-primary-foreground active:scale-90"
@@ -196,7 +186,6 @@ const Produto = () => {
         </div>
       </section>
 
-      {/* CTA fixo */}
       <div className="fixed inset-x-0 bottom-0 z-40 safe-bottom px-3 pt-2">
         <div className="mx-auto max-w-md glass rounded-3xl p-3 shadow-card">
           <button
@@ -212,14 +201,8 @@ const Produto = () => {
   );
 };
 
-/* ===== Subcomponente: grupo de extras ===== */
-
 const ExtraGroupSection = ({
-  group,
-  selection,
-  onInc,
-  onDec,
-  onPickSingle,
+  group, selection, onInc, onDec, onPickSingle,
 }: {
   group: ExtraGroup;
   selection: Record<string, number>;
@@ -238,26 +221,16 @@ const ExtraGroupSection = ({
       <div className="flex items-end justify-between">
         <div>
           <h3 className="font-display text-base font-bold">{group.title}</h3>
-          {group.description && (
-            <p className="mt-0.5 text-xs text-muted-foreground">
-              {group.description}
-            </p>
-          )}
+          {group.description && <p className="mt-0.5 text-xs text-muted-foreground">{group.description}</p>}
         </div>
         <div className="flex items-center gap-1.5">
           {group.required && (
-            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">
-              Obrigatório
-            </span>
+            <span className="rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase text-primary">Obrigatório</span>
           )}
           {isFree && group.max && (
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                limitReached
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              }`}
-            >
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+              limitReached ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+            }`}>
               {used}/{group.max}
             </span>
           )}
@@ -273,20 +246,12 @@ const ExtraGroupSection = ({
           return (
             <li
               key={opt.id}
-              className={`flex items-center justify-between rounded-2xl bg-card p-3 transition-opacity ${
-                blocked ? "opacity-40" : ""
-              }`}
+              className={`flex items-center justify-between rounded-2xl bg-card p-3 transition-opacity ${blocked ? "opacity-40" : ""}`}
             >
               <div className="min-w-0 flex-1">
                 <p className="font-medium text-sm">{opt.name}</p>
-                {opt.price > 0 && (
-                  <p className="mt-0.5 text-xs font-semibold text-primary">
-                    + {brl(opt.price)}
-                  </p>
-                )}
-                {isFree && opt.price === 0 && (
-                  <p className="mt-0.5 text-xs text-muted-foreground">Grátis</p>
-                )}
+                {opt.price > 0 && <p className="mt-0.5 text-xs font-semibold text-primary">+ {brl(opt.price)}</p>}
+                {isFree && opt.price === 0 && <p className="mt-0.5 text-xs text-muted-foreground">Grátis</p>}
               </div>
 
               {isSingle ? (
@@ -294,15 +259,11 @@ const ExtraGroupSection = ({
                   whileTap={{ scale: 0.92 }}
                   onClick={() => onPickSingle(opt)}
                   className={`flex h-7 w-7 items-center justify-center rounded-full border-2 transition-colors ${
-                    selected
-                      ? "border-primary bg-primary"
-                      : "border-border bg-transparent"
+                    selected ? "border-primary bg-primary" : "border-border bg-transparent"
                   }`}
                   aria-label={`Escolher ${opt.name}`}
                 >
-                  {selected && (
-                    <Check className="h-3.5 w-3.5 text-primary-foreground" strokeWidth={3} />
-                  )}
+                  {selected && <Check className="h-3.5 w-3.5 text-primary-foreground" strokeWidth={3} />}
                 </motion.button>
               ) : isPaid || (isFree && qty > 0) ? (
                 <div className="flex items-center gap-2 rounded-full bg-background px-1 py-1">
