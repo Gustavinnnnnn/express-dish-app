@@ -79,8 +79,8 @@ const Perfil = () => {
       </section>
 
       <footer className="mt-8 px-5 pb-2 text-center text-xs text-muted-foreground">
-        <p className="font-display font-semibold">{STORE.name}</p>
-        <p className="mt-0.5">{STORE.address}</p>
+        <p className="font-display font-semibold">{settings?.store_name}</p>
+        <p className="mt-0.5">{settings?.address}</p>
       </footer>
     </AppShell>
   );
