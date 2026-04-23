@@ -8,8 +8,9 @@ import { STORE } from "@/data/menu";
 import { toast } from "sonner";
 
 const Carrinho = () => {
-  const items = useCart((s) => Object.values(s.items));
-  const total = useCart((s) => s.total());
+  const itemsMap = useCart((s) => s.items);
+  const items = Object.values(itemsMap);
+  const total = items.reduce((sum, it) => sum + it.product.price * it.qty, 0);
   const note = useCart((s) => s.note);
   const setNote = useCart((s) => s.setNote);
   const payment = useCart((s) => s.payment);
