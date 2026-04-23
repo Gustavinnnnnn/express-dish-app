@@ -1,17 +1,17 @@
 /* Admin SaaS theme — light premium */
 .admin-scope {
-  --admin-bg: 220 20% 97%;
-  --admin-fg: 222 40% 8%;
-  --admin-muted: 220 15% 28%;
-  --admin-border: 220 15% 86%;
-  --admin-card: 0 0% 100%;
-  --admin-sidebar: 222 30% 11%;
+  --admin-bg: 0 0% 100%;
+  --admin-fg: 0 0% 100%;
+  --admin-muted: 220 12% 75%;
+  --admin-border: 222 20% 22%;
+  --admin-card: 222 25% 10%;
+  --admin-sidebar: 222 30% 8%;
   --admin-sidebar-fg: 0 0% 100%;
-  --admin-primary: 280 75% 45%;
-  --admin-success: 142 70% 35%;
-  --admin-warning: 38 92% 45%;
-  --admin-danger: 0 75% 50%;
-  --admin-soft: 220 20% 92%;
+  --admin-primary: 280 80% 65%;
+  --admin-success: 142 70% 45%;
+  --admin-warning: 38 92% 55%;
+  --admin-danger: 0 75% 60%;
+  --admin-soft: 222 22% 14%;
 
   font-family: 'Inter', system-ui, sans-serif;
   color-scheme: light;
@@ -63,8 +63,28 @@
 
 .admin-badge { display:inline-flex; align-items:center; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
 
-.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; color: hsl(var(--admin-fg)); }
 .admin-table th { text-align: left; padding: 12px 14px; color: hsl(var(--admin-muted)); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; border-bottom: 1px solid hsl(var(--admin-border)); }
-.admin-table td { padding: 14px; border-bottom: 1px solid hsl(var(--admin-border)); }
+.admin-table td { padding: 14px; border-bottom: 1px solid hsl(var(--admin-border)); color: hsl(var(--admin-fg)); }
 .admin-table tr:last-child td { border-bottom: none; }
 .admin-table tbody tr:hover { background: hsl(var(--admin-soft) / 0.5); }
+
+/* Force dark surface on modal/drawer panels (they were hardcoded bg-white) */
+.admin-scope .bg-white { background-color: hsl(var(--admin-card)) !important; color: hsl(var(--admin-fg)); }
+
+/* Topbar sits on white page bg — keep its text dark */
+.admin-scope header.bg-admin-bg\/80,
+.admin-scope header { color: hsl(222 30% 12%); }
+.admin-scope header .text-admin-fg { color: hsl(222 30% 12%) !important; }
+.admin-scope header .text-admin-muted { color: hsl(220 15% 35%) !important; }
+
+/* Outline buttons on white topbar */
+.admin-scope header .admin-btn-outline { background: white; color: hsl(222 30% 12%); border-color: hsl(220 15% 85%); }
+.admin-scope header .admin-btn-outline:hover { background: hsl(220 20% 96%); }
+
+/* Mobile menu button on white bg */
+.admin-scope header button[aria-label="Abrir menu"] { color: hsl(222 30% 12%); }
+
+/* Empty / loading text inside cards */
+.admin-scope .text-admin-muted { color: hsl(var(--admin-muted)); }
+
