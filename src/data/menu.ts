@@ -1,15 +1,29 @@
-import burgerClassic from "@/assets/burger-classic.jpg";
-import burgerBacon from "@/assets/burger-bacon.jpg";
-import burgerSmash from "@/assets/burger-smash.jpg";
-import fries from "@/assets/fries.jpg";
-import wings from "@/assets/wings.jpg";
-import drinkSoda from "@/assets/drink-soda.jpg";
-import milkshake from "@/assets/milkshake.jpg";
+import heroAcai from "@/assets/hero-acai.jpg";
+import acai300 from "@/assets/acai-300.jpg";
+import acai500 from "@/assets/acai-500.jpg";
+import acai1l from "@/assets/acai-1l.jpg";
+import vitamina from "@/assets/vitamina-acai.jpg";
+import picole from "@/assets/picole.jpg";
 
-export type Category = {
+export type Category = { id: string; name: string; emoji: string };
+
+/** Grupo de extras configurável */
+export type ExtraOption = {
   id: string;
   name: string;
-  emoji: string;
+  price: number; // 0 = grátis
+};
+
+export type ExtraGroup = {
+  id: string;
+  title: string;
+  description?: string;
+  /** "free" = grátis (com limite max), "paid" = pago (qty livre, soma preço), "single" = escolha única (radio) */
+  kind: "free" | "paid" | "single";
+  required?: boolean;
+  /** Para "free": limite total de unidades. Para "paid": opcional. */
+  max?: number;
+  options: ExtraOption[];
 };
 
 export type Product = {
@@ -21,112 +35,172 @@ export type Product = {
   category: string;
   popular?: boolean;
   tag?: string;
+  extras?: ExtraGroup[];
 };
 
 export const categories: Category[] = [
-  { id: "burgers", name: "Burgers", emoji: "🍔" },
-  { id: "sides", name: "Acompanhamentos", emoji: "🍟" },
-  { id: "chicken", name: "Frango", emoji: "🍗" },
-  { id: "drinks", name: "Bebidas", emoji: "🥤" },
-  { id: "desserts", name: "Sobremesas", emoji: "🍦" },
+  { id: "acai", name: "Açaí", emoji: "🍇" },
+  { id: "vitaminas", name: "Vitaminas", emoji: "🥤" },
+  { id: "picoles", name: "Picolés", emoji: "🍦" },
 ];
+
+// Grupos reutilizáveis de extras de açaí
+const fruitsFree: ExtraGroup = {
+  id: "frutas",
+  title: "Frutas grátis",
+  description: "Escolha até 3 frutas sem custo",
+  kind: "free",
+  max: 3,
+  options: [
+    { id: "banana", name: "Banana", price: 0 },
+    { id: "morango", name: "Morango", price: 0 },
+    { id: "kiwi", name: "Kiwi", price: 0 },
+    { id: "uva", name: "Uva", price: 0 },
+    { id: "manga", name: "Manga", price: 0 },
+  ],
+};
+
+const toppingsFree: ExtraGroup = {
+  id: "complementos-free",
+  title: "Complementos grátis",
+  description: "Escolha até 2",
+  kind: "free",
+  max: 2,
+  options: [
+    { id: "leite-po", name: "Leite em pó", price: 0 },
+    { id: "leite-cond", name: "Leite condensado", price: 0 },
+    { id: "mel", name: "Mel", price: 0 },
+    { id: "granola-s", name: "Granola simples", price: 0 },
+  ],
+};
+
+const toppingsPaid: ExtraGroup = {
+  id: "extras-pagos",
+  title: "Extras pagos",
+  description: "Adicione quantos quiser",
+  kind: "paid",
+  options: [
+    { id: "granola-p", name: "Granola premium", price: 2.0 },
+    { id: "nutella", name: "Nutella", price: 4.0 },
+    { id: "ovomaltine", name: "Ovomaltine", price: 3.0 },
+    { id: "paçoca", name: "Paçoca", price: 2.5 },
+    { id: "morango-extra", name: "Morango extra", price: 3.5 },
+    { id: "amendoim", name: "Amendoim", price: 2.0 },
+  ],
+};
+
+const utensil: ExtraGroup = {
+  id: "colher",
+  title: "Acompanhamentos",
+  kind: "single",
+  required: true,
+  options: [
+    { id: "com-colher", name: "Com colher", price: 0 },
+    { id: "sem-colher", name: "Sem colher", price: 0 },
+  ],
+};
+
+const acaiExtras: ExtraGroup[] = [fruitsFree, toppingsFree, toppingsPaid, utensil];
 
 export const products: Product[] = [
   {
     id: "p1",
-    name: "Cheeseburger Clássico",
-    description: "Pão brioche, blend 150g, cheddar, alface e molho da casa.",
-    price: 28.9,
-    image: burgerClassic,
-    category: "burgers",
+    name: "Açaí 300ml",
+    description: "Polpa de açaí cremosa batida na hora.",
+    price: 14.9,
+    image: acai300,
+    category: "acai",
     popular: true,
+    extras: acaiExtras,
   },
   {
     id: "p2",
-    name: "Bacon Lover",
-    description: "Duplo cheddar, bacon crocante, cebola caramelizada.",
-    price: 36.9,
-    image: burgerBacon,
-    category: "burgers",
+    name: "Açaí 500ml",
+    description: "Tamanho clássico para matar a fome.",
+    price: 19.9,
+    image: acai500,
+    category: "acai",
     popular: true,
     tag: "Mais pedido",
+    extras: acaiExtras,
   },
   {
     id: "p3",
-    name: "Smash Onion BBQ",
-    description: "Dois smash, anéis de cebola, BBQ defumado e cheddar.",
-    price: 39.9,
-    image: burgerSmash,
-    category: "burgers",
-    tag: "Novo",
+    name: "Açaí 1 Litro",
+    description: "Tamanho família — perfeito para dividir.",
+    price: 34.9,
+    image: acai1l,
+    category: "acai",
+    tag: "Família",
+    extras: acaiExtras,
   },
   {
     id: "p4",
-    name: "Batata Rústica",
-    description: "Crocante por fora, macia por dentro. Porção generosa.",
-    price: 18.9,
-    image: fries,
-    category: "sides",
+    name: "Vitamina de Açaí",
+    description: "Açaí batido com leite e banana. Cremoso e refrescante.",
+    price: 16.9,
+    image: vitamina,
+    category: "vitaminas",
     popular: true,
+    extras: [
+      {
+        id: "fruta-vit",
+        title: "Fruta adicional",
+        kind: "single",
+        options: [
+          { id: "banana", name: "Banana (padrão)", price: 0 },
+          { id: "morango", name: "Morango", price: 0 },
+          { id: "manga", name: "Manga", price: 0 },
+        ],
+      },
+      toppingsPaid,
+    ],
   },
   {
     id: "p5",
-    name: "Asinhas BBQ",
-    description: "8 unidades ao molho barbecue artesanal.",
-    price: 32.9,
-    image: wings,
-    category: "chicken",
-  },
-  {
-    id: "p6",
-    name: "Refrigerante 350ml",
-    description: "Lata gelada — diversos sabores.",
-    price: 7.5,
-    image: drinkSoda,
-    category: "drinks",
-  },
-  {
-    id: "p7",
-    name: "Milkshake Chocolate",
-    description: "Cremoso com calda de chocolate belga.",
-    price: 19.9,
-    image: milkshake,
-    category: "desserts",
-    popular: true,
+    name: "Picolé de Açaí",
+    description: "Picolé artesanal de açaí puro.",
+    price: 7.9,
+    image: picole,
+    category: "picoles",
   },
 ];
 
 export const offers = [
   {
     id: "o1",
-    title: "Combo Bacon Lover",
-    subtitle: "Burger + Batata + Refri",
-    price: 49.9,
-    oldPrice: 63.3,
-    image: burgerBacon,
+    title: "Açaí 500ml + 2 extras",
+    subtitle: "Monte do seu jeito",
+    price: 24.9,
+    oldPrice: 29.9,
+    image: acai500,
+    productId: "p2",
   },
   {
     id: "o2",
-    title: "Dobradinha Smash",
-    subtitle: "2 Smash Onion BBQ",
-    price: 69.9,
-    oldPrice: 79.8,
-    image: burgerSmash,
+    title: "Combo Família 1L",
+    subtitle: "Açaí 1L + extras pagos",
+    price: 39.9,
+    oldPrice: 49.9,
+    image: acai1l,
+    productId: "p3",
   },
   {
     id: "o3",
-    title: "Família Feliz",
-    subtitle: "4 burgers + 2 batatas + 4 refris",
-    price: 139.9,
-    oldPrice: 178.2,
-    image: burgerClassic,
+    title: "Vitamina cremosa",
+    subtitle: "Vitamina de açaí 500ml",
+    price: 14.9,
+    oldPrice: 18.9,
+    image: vitamina,
+    productId: "p4",
   },
 ];
 
-// Loja
 export const STORE = {
-  name: "Flame Burger",
-  tagline: "Smash burgers artesanais",
-  whatsapp: "5551999999999", // formato internacional sem +
-  address: "Rua das Brasas, 123 — Centro",
+  name: "Roxo Açaí",
+  tagline: "Açaí cremoso do jeito que você ama",
+  whatsapp: "5551999999999",
+  address: "Rua dos Frutos, 456 — Centro",
 };
+
+export { heroAcai };
