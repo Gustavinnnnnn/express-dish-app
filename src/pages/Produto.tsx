@@ -23,6 +23,29 @@ const Produto = () => {
   const [qty, setQty] = useState(1);
   const [note, setNote] = useState("");
 
+  // Lista plana de selecionados (calculada antes de qualquer early return p/ manter ordem dos hooks)
+  const selectedExtras: SelectedExtra[] = useMemo(() => {
+    if (!product?.extras) return [];
+    const list: SelectedExtra[] = [];
+    for (const g of product.extras) {
+      const sel = selection[g.id] ?? {};
+      for (const opt of g.options) {
+        const q = sel[opt.id] ?? 0;
+        if (q > 0) {
+          list.push({
+            groupId: g.id,
+            groupTitle: g.title,
+            optionId: opt.id,
+            optionName: opt.name,
+            qty: q,
+            unitPrice: opt.price,
+          });
+        }
+      }
+    }
+    return list;
+  }, [selection, product]);
+
   if (!product) {
     return (
       <div className="flex min-h-screen items-center justify-center p-6 text-center">
@@ -68,29 +91,6 @@ const Produto = () => {
   const pickSingle = (group: ExtraGroup, opt: ExtraOption) => {
     setSelection((prev) => ({ ...prev, [group.id]: { [opt.id]: 1 } }));
   };
-
-  // Lista plana de selecionados
-  const selectedExtras: SelectedExtra[] = useMemo(() => {
-    if (!product.extras) return [];
-    const list: SelectedExtra[] = [];
-    for (const g of product.extras) {
-      const sel = selection[g.id] ?? {};
-      for (const opt of g.options) {
-        const q = sel[opt.id] ?? 0;
-        if (q > 0) {
-          list.push({
-            groupId: g.id,
-            groupTitle: g.title,
-            optionId: opt.id,
-            optionName: opt.name,
-            qty: q,
-            unitPrice: opt.price,
-          });
-        }
-      }
-    }
-    return list;
-  }, [selection, product.extras]);
 
   const unitPrice = computeUnitPrice(product, selectedExtras);
   const total = unitPrice * qty;
