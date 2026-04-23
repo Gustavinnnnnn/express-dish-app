@@ -4,10 +4,12 @@ import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { useCart, useProfile } from "@/store/cart";
 import { brl } from "@/lib/format";
-import { STORE } from "@/data/menu";
+import { useStoreData } from "@/store/storeData";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const Carrinho = () => {
+  const { settings } = useStoreData();
   const itemsMap = useCart((s) => s.items);
   const items = Object.values(itemsMap);
   const total = items.reduce((sum, it) => sum + it.unitPrice * it.qty, 0);
@@ -28,7 +30,7 @@ const Carrinho = () => {
     cartao: "Cartão na entrega",
   }[payment];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (items.length === 0) return;
 
     const lines: string[] = [];
@@ -58,8 +60,11 @@ const Carrinho = () => {
       if (it.note) lines.push(`  _Obs.:_ ${it.note}`);
     });
 
+    const storeName = settings?.store_name || "Loja";
+    const whatsapp = settings?.whatsapp || "";
+
     const msg = [
-      `*Novo pedido — ${STORE.name}* 🍇`,
+      `*Novo pedido — ${storeName}* 🍇`,
       ...lines,
       "",
       `*Total:* ${brl(total)}`,
@@ -72,14 +77,38 @@ const Carrinho = () => {
       .filter(Boolean)
       .join("\n");
 
+    // Persiste o pedido no banco — aparece em /admin/pedidos em tempo real
+    try {
+      await supabase.from("orders").insert({
+        customer_name: profile.name || null,
+        customer_phone: profile.phone || null,
+        items: items.map((it) => ({
+          product_id: it.product.id,
+          name: it.product.name,
+          qty: it.qty,
+          unit_price: it.unitPrice,
+          extras: it.extras,
+          note: it.note ?? null,
+        })) as any,
+        total,
+        payment_method: payment,
+        notes: note || null,
+        status: "novo",
+      });
+    } catch (e) {
+      console.error("Falha ao salvar pedido", e);
+    }
+
     addOrder({
       total,
       items: items.map((it) => `${it.qty}x ${it.product.name}`),
     });
 
-    const url = `https://wa.me/${STORE.whatsapp}?text=${encodeURIComponent(msg)}`;
-    window.open(url, "_blank");
-    toast.success("Pedido enviado para o WhatsApp!");
+    if (whatsapp) {
+      const url = `https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`;
+      window.open(url, "_blank");
+    }
+    toast.success("Pedido enviado!");
     clear();
   };
 
