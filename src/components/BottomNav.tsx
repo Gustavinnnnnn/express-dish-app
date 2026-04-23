@@ -12,7 +12,9 @@ const items = [
 ];
 
 export const BottomNav = () => {
-  const count = useCart((s) => s.count());
+  const count = useCart((s) =>
+    Object.values(s.items).reduce((sum, it) => sum + it.qty, 0)
+  );
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 safe-bottom px-3 pt-2">
