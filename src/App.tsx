@@ -8,6 +8,7 @@ import Explorar from "./pages/Explorar.tsx";
 import Ofertas from "./pages/Ofertas.tsx";
 import Carrinho from "./pages/Carrinho.tsx";
 import Perfil from "./pages/Perfil.tsx";
+import Produto from "./pages/Produto.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/ofertas" element={<Ofertas />} />
           <Route path="/carrinho" element={<Carrinho />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/produto/:id" element={<Produto />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
