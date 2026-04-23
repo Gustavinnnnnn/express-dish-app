@@ -1,17 +1,17 @@
 /* Admin SaaS theme — light premium */
 .admin-scope {
   --admin-bg: 220 20% 97%;
-  --admin-fg: 222 25% 14%;
-  --admin-muted: 220 10% 46%;
-  --admin-border: 220 15% 90%;
+  --admin-fg: 222 40% 8%;
+  --admin-muted: 220 15% 28%;
+  --admin-border: 220 15% 86%;
   --admin-card: 0 0% 100%;
   --admin-sidebar: 222 30% 11%;
   --admin-sidebar-fg: 0 0% 100%;
-  --admin-primary: 280 75% 55%;
-  --admin-success: 142 70% 42%;
-  --admin-warning: 38 92% 55%;
-  --admin-danger: 0 75% 55%;
-  --admin-soft: 220 20% 94%;
+  --admin-primary: 280 75% 45%;
+  --admin-success: 142 70% 35%;
+  --admin-warning: 38 92% 45%;
+  --admin-danger: 0 75% 50%;
+  --admin-soft: 220 20% 92%;
 
   font-family: 'Inter', system-ui, sans-serif;
   color-scheme: light;
