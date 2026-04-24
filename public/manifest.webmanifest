@@ -1,13 +1,13 @@
 {
-  "name": "Roxo Açaí — Delivery",
-  "short_name": "Roxo Açaí",
-  "description": "Peça seu açaí cremoso em poucos toques.",
+  "name": "Meu Aplicativo",
+  "short_name": "Meu App",
+  "description": "Peça em poucos toques.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#16101e",
-  "theme_color": "#16101e",
+  "background_color": "#1e88e5",
+  "theme_color": "#1e88e5",
   "icons": [
     {
       "src": "/icon-512.png",
