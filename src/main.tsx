@@ -4,7 +4,6 @@ import "./index.css";
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// Registro do Service Worker (PWA) — só em produção e fora de iframe/preview
 const isInIframe = (() => {
   try {
     return window.self !== window.top;
@@ -20,14 +19,24 @@ const isPreviewHost =
   host === "localhost" ||
   host === "127.0.0.1";
 
-if (isInIframe || isPreviewHost) {
-  // Garante que nenhum SW antigo fique cacheando o preview
-  if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
-  }
-} else if ("serviceWorker" in navigator) {
-  // Registra SW estático (necessário pra browser disparar beforeinstallprompt)
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register("/sw.js").catch(() => {});
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", async () => {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+
+    if (isInIframe || isPreviewHost) {
+      await Promise.all(registrations.map((registration) => registration.unregister()));
+      return;
+    }
+
+    await Promise.all(
+      registrations
+        .filter((registration) => !registration.active?.scriptURL.includes("/sw.js?v=2"))
+        .map((registration) => registration.unregister()),
+    );
+
+    navigator.serviceWorker
+      .register("/sw.js?v=2", { scope: "/", updateViaCache: "none" })
+      .then((registration) => registration.update())
+      .catch(() => {});
   });
 }

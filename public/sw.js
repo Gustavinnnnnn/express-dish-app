@@ -1,16 +1,17 @@
-// Service Worker mínimo só pra habilitar instalação como PWA.
-// Não faz cache agressivo pra evitar conflitos com builds novas.
-const VERSION = "v1";
-
-self.addEventListener("install", (event) => {
+self.addEventListener("install", () => {
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((key) => caches.delete(key)));
+      await self.clients.claim();
+    })(),
+  );
 });
 
-self.addEventListener("fetch", (event) => {
-  // network-first simples; deixa o navegador tratar normalmente
-  return;
+self.addEventListener("fetch", () => {
+  // Sem cache customizado: deixa a rede/navegador cuidar das atualizações.
 });
