@@ -1,9 +1,10 @@
 import { motion } from "framer-motion";
-import { Sparkles, MapPin } from "lucide-react";
+import { Sparkles, MapPin, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard, ProductChip } from "@/components/ProductCard";
 import { useStoreData } from "@/store/storeData";
+import { brl } from "@/lib/format";
 import heroFallback from "@/assets/hero-acai.jpg";
 
 const Index = () => {
