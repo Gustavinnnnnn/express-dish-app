@@ -3,6 +3,7 @@ import { Sparkles, MapPin, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard, ProductChip } from "@/components/ProductCard";
+import { InstallAppButton } from "@/components/InstallAppButton";
 import { useStoreData } from "@/store/storeData";
 import { brl } from "@/lib/format";
 import heroFallback from "@/assets/hero-acai.jpg";
@@ -29,6 +30,7 @@ const Index = () => {
 
   return (
     <AppShell>
+      <InstallAppButton />
       {/* Header */}
       <header className="safe-top flex items-center justify-between px-5 pb-2 pt-4">
         <div>
