@@ -83,9 +83,9 @@ export const AdminLayout = ({ children, title }: { children: ReactNode; title?: 
       {open && <div className="fixed inset-0 z-30 bg-black/50 lg:hidden" onClick={() => setOpen(false)} />}
 
       {/* Main */}
-      <div className="lg:pl-64">
+      <div className="min-w-0 lg:pl-64">
         {/* Topbar */}
-        <header className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-admin-border bg-admin-bg/80 px-4 backdrop-blur lg:px-8">
+        <header className="sticky top-0 z-20 flex min-h-16 flex-wrap items-center gap-3 border-b border-admin-border bg-admin-bg/95 px-4 py-3 backdrop-blur lg:flex-nowrap lg:px-8">
           <button className="lg:hidden text-admin-fg" onClick={() => setOpen(true)} aria-label="Abrir menu">
             <Menu className="size-5" />
           </button>
@@ -93,16 +93,18 @@ export const AdminLayout = ({ children, title }: { children: ReactNode; title?: 
             <p className="text-xs text-admin-muted">Painel</p>
             <h1 className="truncate font-display text-lg font-semibold leading-tight">{title ?? current?.label ?? "Admin"}</h1>
           </div>
-          <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex border-admin-border bg-white text-admin-fg hover:bg-admin-soft">
+          <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
+          <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex border-admin-border bg-admin-card text-admin-fg hover:bg-admin-soft">
             <Link to="/" target="_blank"><Eye className="size-4" />Pré-visualizar</Link>
           </Button>
           <Button size="sm" asChild className="bg-admin-primary text-white hover:bg-admin-primary/90">
             <Link to="/" target="_blank"><ExternalLink className="size-4" />Ver loja</Link>
           </Button>
           <div className="grid h-9 w-9 place-items-center rounded-full bg-admin-primary text-sm font-semibold text-white">A</div>
+          </div>
         </header>
 
-        <main className="p-4 lg:p-8">{children}</main>
+        <main className="min-w-0 p-4 lg:p-8">{children}</main>
       </div>
     </div>
   );
