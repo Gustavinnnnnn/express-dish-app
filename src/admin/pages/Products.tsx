@@ -32,7 +32,7 @@ export default function AdminProducts() {
 
   return (
     <AdminLayout title="Produtos">
-      <div className="mb-5 flex items-center justify-between">
+      <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-admin-muted">{items.length} produtos cadastrados</p>
         <button className="admin-btn admin-btn-primary" onClick={() => setEditing({ name: "", price: 0, active: true, featured: false, extras: [] })}>
           <Plus className="size-4" /> Novo produto
@@ -135,7 +135,7 @@ function ProductDrawer({ value, cats, onClose, onSaved }: { value: Partial<Produ
           </Field>
           <Field label="Nome"><input className="admin-input" value={v.name ?? ""} onChange={(e) => set("name", e.target.value)} /></Field>
           <Field label="Descrição"><textarea className="admin-textarea" value={v.description ?? ""} onChange={(e) => set("description", e.target.value)} /></Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Preço (R$)"><input className="admin-input" type="number" step="0.10" value={v.price ?? 0} onChange={(e) => set("price", parseFloat(e.target.value))} /></Field>
             <Field label="Categoria">
               <select className="admin-input" value={v.category_id ?? ""} onChange={(e) => set("category_id", e.target.value || null)}>
