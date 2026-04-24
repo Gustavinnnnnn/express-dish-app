@@ -27,13 +27,14 @@ const Carrinho = () => {
   const addOrder = useProfile((s) => s.addOrder);
   const [processing, setProcessing] = useState(false);
 
-  const paymentMode = (settings as any)?.payment_mode || "whatsapp";
-
   const paymentLabel = {
     pix: "Pix",
     dinheiro: "Dinheiro",
-    cartao: "Cartão na entrega",
+    cartao: "Cartão",
   }[payment];
+
+  // Pix e Cartão pagam pelo Mercado Pago. Dinheiro vai pro WhatsApp.
+  const isOnlinePayment = payment === "pix" || payment === "cartao";
 
   const validateProfile = () => {
     if (!profile.name.trim()) { toast.error("Informe seu nome"); return false; }
@@ -303,13 +304,12 @@ const Carrinho = () => {
             />
           </section>
 
-          {paymentMode === "whatsapp" && (
           <section className="mt-5 px-5">
             <label className="mb-2 block font-display text-sm font-semibold">
-              Pagamento
+              Forma de pagamento
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {(["pix", "dinheiro", "cartao"] as const).map((p) => (
+              {(["pix", "cartao", "dinheiro"] as const).map((p) => (
                 <button
                   key={p}
                   onClick={() => setPayment(p)}
@@ -320,13 +320,17 @@ const Carrinho = () => {
                   }`}
                 >
                   {p === "pix" && "Pix"}
-                  {p === "dinheiro" && "Dinheiro"}
                   {p === "cartao" && "Cartão"}
+                  {p === "dinheiro" && "Dinheiro"}
                 </button>
               ))}
             </div>
+            <p className="mt-2 text-[11px] text-muted-foreground">
+              {payment === "dinheiro"
+                ? "Dinheiro: pedido enviado pelo WhatsApp para combinar troco."
+                : "Pagamento online seguro pelo Mercado Pago."}
+            </p>
           </section>
-          )}
 
           <section className="mt-6 px-5">
             <div className="rounded-2xl bg-card p-4 shadow-card">
@@ -346,7 +350,7 @@ const Carrinho = () => {
               </div>
             </div>
 
-            {paymentMode === "online" ? (
+            {isOnlinePayment ? (
               <>
                 <button
                   onClick={handlePayOnline}
@@ -354,10 +358,10 @@ const Carrinho = () => {
                   className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-4 font-display text-base font-bold text-primary-foreground shadow-glow transition-transform active:scale-[0.98] disabled:opacity-60"
                 >
                   <CreditCard className="h-5 w-5" />
-                  {processing ? "Abrindo pagamento..." : "Pagar agora"}
+                  {processing ? "Abrindo pagamento..." : `Pagar com ${paymentLabel}`}
                 </button>
                 <p className="mt-2 text-center text-[11px] text-muted-foreground">
-                  Pagamento seguro via Mercado Pago — Pix, cartão ou boleto
+                  Você será redirecionado ao checkout do Mercado Pago
                 </p>
               </>
             ) : (
