@@ -1,6 +1,6 @@
-/* Admin SaaS theme — light premium */
+/* Admin SaaS theme — dark premium */
 .admin-scope {
-  --admin-bg: 0 0% 100%;
+  --admin-bg: 222 28% 9%;
   --admin-fg: 0 0% 100%;
   --admin-muted: 220 12% 75%;
   --admin-border: 222 20% 22%;
@@ -14,7 +14,7 @@
   --admin-soft: 222 22% 14%;
 
   font-family: 'Inter', system-ui, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .admin-scope .bg-admin-bg { background-color: hsl(var(--admin-bg)); }

@@ -29,26 +29,28 @@ export default function AdminTeam() {
         <button className="admin-btn admin-btn-primary" onClick={() => setEdit({ name: "", role: "operador", active: true })}><Plus className="size-4" /> Novo membro</button>
       </div>
       <div className="admin-card overflow-hidden">
-        <table className="admin-table">
-          <thead><tr><th>Nome</th><th>Email</th><th>Função</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {items.map((m) => (
-              <tr key={m.id}>
-                <td className="font-medium">{m.name}</td>
-                <td className="text-admin-muted">{m.email ?? "—"}</td>
-                <td><span className="admin-badge capitalize" style={{ background: "hsl(var(--admin-primary) / 0.12)", color: "hsl(var(--admin-primary))" }}>{m.role}</span></td>
-                <td>{m.active ? "Ativo" : "Inativo"}</td>
-                <td>
-                  <div className="flex justify-end gap-1">
-                    <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(m)}><Pencil className="size-4" /></button>
-                    <button className="admin-btn admin-btn-ghost text-red-500" onClick={() => remove(m.id)}><Trash2 className="size-4" /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && <tr><td colSpan={5} className="text-center text-admin-muted">Nenhum membro</td></tr>}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead><tr><th>Nome</th><th>Email</th><th>Função</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {items.map((m) => (
+                <tr key={m.id}>
+                  <td className="font-medium">{m.name}</td>
+                  <td className="text-admin-muted">{m.email ?? "—"}</td>
+                  <td><span className="admin-badge capitalize" style={{ background: "hsl(var(--admin-primary) / 0.12)", color: "hsl(var(--admin-primary))" }}>{m.role}</span></td>
+                  <td>{m.active ? "Ativo" : "Inativo"}</td>
+                  <td>
+                    <div className="flex justify-end gap-1">
+                      <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(m)}><Pencil className="size-4" /></button>
+                      <button className="admin-btn admin-btn-danger" onClick={() => remove(m.id)}><Trash2 className="size-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && <tr><td colSpan={5} className="text-center text-admin-muted">Nenhum membro</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {edit && (
