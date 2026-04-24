@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { ExtraGroup } from "@/data/menu";
+import { applyThemeVars, type DemoTheme } from "@/admin/lib/demoPresets";
 
 export type DbCategory = { id: string; name: string; emoji: string | null; image_url: string | null; position: number; active: boolean };
 export type DbProduct = {
@@ -22,6 +23,7 @@ export type DbSettings = {
   payment_mode?: "whatsapp" | "online";
   mp_public_key?: string | null;
   mp_environment?: "sandbox" | "production";
+  theme?: Partial<DemoTheme> | null;
 };
 
 /** Compat shim — front-end antigo espera "image" e "category" string */
@@ -67,15 +69,18 @@ export function useStoreData() {
     return () => { supabase.removeChannel(ch); };
   }, []);
 
-  // Aplica cor primária dinamicamente
+  // Aplica tema completo (paleta) e cor primária dinamicamente
   useEffect(() => {
-    if (settings?.primary_color) {
+    if (settings?.theme && Object.keys(settings.theme).length) {
+      applyThemeVars(settings.theme);
+    } else if (settings?.primary_color) {
       document.documentElement.style.setProperty("--primary", settings.primary_color);
+      document.documentElement.style.setProperty("--ring", settings.primary_color);
     }
     if (settings?.store_name) {
       document.title = settings.store_name;
     }
-  }, [settings?.primary_color, settings?.store_name]);
+  }, [settings?.theme, settings?.primary_color, settings?.store_name]);
 
   return { settings, categories, products, offers, loading, reload: load };
 }

@@ -16,12 +16,13 @@ export async function applyDemoPreset(preset: DemoPreset) {
   const settingsPayload = {
     store_name: preset.settings.store_name,
     tagline: preset.settings.tagline,
-    primary_color: preset.settings.primary_color,
+    primary_color: preset.theme.primary,
     banner_url: preset.settings.banner_url,
     logo_url: preset.settings.logo_url ?? null,
     hero_title: preset.settings.hero_title,
     hero_subtitle: preset.settings.hero_subtitle,
     default_message: preset.settings.default_message,
+    theme: preset.theme as any,
   };
 
   if (existing?.id) {
