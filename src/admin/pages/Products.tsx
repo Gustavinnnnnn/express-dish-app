@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "../AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { Product, Category, uploadAsset } from "../lib/queries";
-import { Pencil, Plus, Trash2, Upload, X } from "lucide-react";
+import { Pencil, Plus, Trash2, Upload, X, Star } from "lucide-react";
 import { fmtBRL } from "@/lib/format";
 import { toast } from "sonner";
+import { ExtrasEditor } from "../components/ExtrasEditor";
+import type { ExtraGroup } from "@/data/menu";
 
 export default function AdminProducts() {
   const [items, setItems] = useState<Product[]>([]);
@@ -144,9 +146,25 @@ function ProductDrawer({ value, cats, onClose, onSaved }: { value: Partial<Produ
               </select>
             </Field>
           </div>
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!v.featured} onChange={(e) => set("featured", e.target.checked)} /> Destaque</label>
-            <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={v.active ?? true} onChange={(e) => set("active", e.target.checked)} /> Ativo</label>
+          <div className="flex flex-wrap gap-x-6 gap-y-3">
+            <label className="flex items-center gap-2 text-sm text-admin-fg">
+              <input type="checkbox" checked={!!v.featured} onChange={(e) => set("featured", e.target.checked)} />
+              <Star className="size-4 text-admin-primary" /> Destaque (mais vendidos / promoção)
+            </label>
+            <label className="flex items-center gap-2 text-sm text-admin-fg">
+              <input type="checkbox" checked={v.active ?? true} onChange={(e) => set("active", e.target.checked)} /> Ativo
+            </label>
+          </div>
+
+          <div>
+            <div className="mb-2 mt-1">
+              <h3 className="text-sm font-semibold text-admin-fg">Acompanhamentos / extras</h3>
+              <p className="text-xs text-admin-muted">Crie categorias com itens grátis ou pagos. Funciona pra qualquer produto (não só açaí).</p>
+            </div>
+            <ExtrasEditor
+              value={(v.extras as ExtraGroup[]) ?? []}
+              onChange={(next) => set("extras", next)}
+            />
           </div>
         </div>
 
