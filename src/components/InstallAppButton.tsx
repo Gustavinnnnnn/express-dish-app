@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { Download, Plus, Share, Smartphone, X } from "lucide-react";
 import { useEffect, useState, type MouseEvent } from "react";
+import { useLocation } from "react-router-dom";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 };
 
-const DISMISS_KEY = "pwa-install-dismissed";
-
 export const InstallAppButton = () => {
+  const location = useLocation();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [dismissed, setDismissed] = useState(false);
@@ -37,11 +37,6 @@ export const InstallAppButton = () => {
       return;
     }
 
-    const d = localStorage.getItem(DISMISS_KEY);
-    if (d && Date.now() - Number(d) < 7 * 24 * 60 * 60 * 1000) {
-      setDismissed(true);
-    }
-
     const onBip = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
@@ -60,10 +55,12 @@ export const InstallAppButton = () => {
     };
   }, []);
 
+  const hideOnRoute = location.pathname.startsWith("/admin") || location.pathname === "/auth";
+
   const canShowNativeInstall = Boolean(deferredPrompt) && !isIOS && isSecureInstallContext;
   const canShowIosFallback = isIOS && isSecureInstallContext;
 
-  if (installed || dismissed || (!canShowNativeInstall && !canShowIosFallback)) return null;
+  if (hideOnRoute || installed || dismissed || (!canShowNativeInstall && !canShowIosFallback)) return null;
 
   const handleClick = async () => {
     if (!deferredPrompt) return;
@@ -75,7 +72,6 @@ export const InstallAppButton = () => {
       if (choice.outcome === "accepted") {
         setInstalled(true);
       } else {
-        localStorage.setItem(DISMISS_KEY, String(Date.now()));
         setDismissed(true);
       }
     } finally {
@@ -85,7 +81,6 @@ export const InstallAppButton = () => {
 
   const dismiss = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    localStorage.setItem(DISMISS_KEY, String(Date.now()));
     setDismissed(true);
   };
 
