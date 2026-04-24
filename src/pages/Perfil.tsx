@@ -55,13 +55,13 @@ const Perfil = () => {
         </div>
       </section>
 
-      <section className="mt-5 flex flex-col gap-3 px-5">
-        <Field icon={<User className="h-4 w-4" />} placeholder="Seu nome"
-          value={profile.name} onChange={(v) => setProfile({ name: v })} />
-        <Field icon={<Phone className="h-4 w-4" />} placeholder="Telefone (WhatsApp)"
-          value={profile.phone} onChange={(v) => setProfile({ phone: v })} />
-        <Field icon={<MapPin className="h-4 w-4" />} placeholder="Endereço de entrega"
-          value={profile.address} onChange={(v) => setProfile({ address: v })} />
+      <section className="mt-5 flex flex-col gap-2 px-5">
+        <InfoRow icon={<User className="h-4 w-4" />} label="Nome" value={profile.name} />
+        <InfoRow icon={<Phone className="h-4 w-4" />} label="Telefone" value={profile.phone} />
+        <InfoRow icon={<MapPin className="h-4 w-4" />} label="Endereço" value={profile.address} />
+        <p className="mt-1 px-2 text-[11px] text-muted-foreground">
+          Seus dados são preenchidos no carrinho ao finalizar o pedido.
+        </p>
       </section>
 
       <section className="mt-7 px-5">
