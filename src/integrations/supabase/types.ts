@@ -131,13 +131,18 @@ export type Database = {
         Row: {
           code: string
           created_at: string
+          customer_address: string | null
           customer_id: string | null
           customer_name: string | null
           customer_phone: string | null
+          estimated_minutes: number | null
           id: string
           items: Json
+          mp_payment_id: string | null
+          mp_preference_id: string | null
           notes: string | null
           payment_method: string | null
+          payment_status: string
           status: Database["public"]["Enums"]["order_status"]
           total: number
           updated_at: string
@@ -145,13 +150,18 @@ export type Database = {
         Insert: {
           code?: string
           created_at?: string
+          customer_address?: string | null
           customer_id?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          estimated_minutes?: number | null
           id?: string
           items?: Json
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
           notes?: string | null
           payment_method?: string | null
+          payment_status?: string
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
@@ -159,13 +169,18 @@ export type Database = {
         Update: {
           code?: string
           created_at?: string
+          customer_address?: string | null
           customer_id?: string | null
           customer_name?: string | null
           customer_phone?: string | null
+          estimated_minutes?: number | null
           id?: string
           items?: Json
+          mp_payment_id?: string | null
+          mp_preference_id?: string | null
           notes?: string | null
           payment_method?: string | null
+          payment_status?: string
           status?: Database["public"]["Enums"]["order_status"]
           total?: number
           updated_at?: string
@@ -240,7 +255,11 @@ export type Database = {
           hours: Json
           id: string
           logo_url: string | null
+          mp_access_token: string | null
+          mp_environment: string
+          mp_public_key: string | null
           payment_methods: Json
+          payment_mode: string
           primary_color: string
           store_name: string
           tagline: string | null
@@ -256,7 +275,11 @@ export type Database = {
           hours?: Json
           id?: string
           logo_url?: string | null
+          mp_access_token?: string | null
+          mp_environment?: string
+          mp_public_key?: string | null
           payment_methods?: Json
+          payment_mode?: string
           primary_color?: string
           store_name?: string
           tagline?: string | null
@@ -272,7 +295,11 @@ export type Database = {
           hours?: Json
           id?: string
           logo_url?: string | null
+          mp_access_token?: string | null
+          mp_environment?: string
+          mp_public_key?: string | null
           payment_methods?: Json
+          payment_mode?: string
           primary_color?: string
           store_name?: string
           tagline?: string | null

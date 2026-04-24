@@ -44,6 +44,11 @@ export type Order = {
   payment_method: string | null;
   notes: string | null;
   created_at: string;
+  payment_status?: string | null;
+  mp_preference_id?: string | null;
+  mp_payment_id?: string | null;
+  customer_address?: string | null;
+  estimated_minutes?: number | null;
 };
 
 export type Customer = {
@@ -77,6 +82,10 @@ export type StoreSettings = {
   payment_methods: string[];
   hero_title: string | null;
   hero_subtitle: string | null;
+  payment_mode?: "whatsapp" | "online";
+  mp_access_token?: string | null;
+  mp_public_key?: string | null;
+  mp_environment?: "sandbox" | "production";
 };
 
 export async function uploadAsset(file: File, prefix = "img") {

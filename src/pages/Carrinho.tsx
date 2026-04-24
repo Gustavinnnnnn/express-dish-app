@@ -1,4 +1,4 @@
-import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingBag, CreditCard, User, Phone, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
@@ -7,6 +7,7 @@ import { brl } from "@/lib/format";
 import { useStoreData } from "@/store/storeData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useState } from "react";
 
 const Carrinho = () => {
   const { settings } = useStoreData();
@@ -22,7 +23,11 @@ const Carrinho = () => {
   const remove = useCart((s) => s.remove);
   const clear = useCart((s) => s.clear);
   const profile = useProfile();
+  const setProfile = useProfile((s) => s.set);
   const addOrder = useProfile((s) => s.addOrder);
+  const [processing, setProcessing] = useState(false);
+
+  const paymentMode = (settings as any)?.payment_mode || "whatsapp";
 
   const paymentLabel = {
     pix: "Pix",
@@ -30,8 +35,26 @@ const Carrinho = () => {
     cartao: "Cartão na entrega",
   }[payment];
 
+  const validateProfile = () => {
+    if (!profile.name.trim()) { toast.error("Informe seu nome"); return false; }
+    if (!profile.phone.trim()) { toast.error("Informe seu telefone"); return false; }
+    if (!profile.address.trim()) { toast.error("Informe seu endereço de entrega"); return false; }
+    return true;
+  };
+
+  const buildItemsPayload = () => items.map((it) => ({
+    product_id: it.product.id,
+    name: it.product.name,
+    qty: it.qty,
+    unit_price: it.unitPrice,
+    extras: it.extras,
+    note: it.note ?? null,
+  }));
+
   const handleSend = async () => {
     if (items.length === 0) return;
+    if (!validateProfile()) return;
+    setProcessing(true);
 
     const lines: string[] = [];
     items.forEach((it) => {
@@ -82,18 +105,13 @@ const Carrinho = () => {
       await supabase.from("orders").insert({
         customer_name: profile.name || null,
         customer_phone: profile.phone || null,
-        items: items.map((it) => ({
-          product_id: it.product.id,
-          name: it.product.name,
-          qty: it.qty,
-          unit_price: it.unitPrice,
-          extras: it.extras,
-          note: it.note ?? null,
-        })) as any,
+        customer_address: profile.address || null,
+        items: buildItemsPayload() as any,
         total,
         payment_method: payment,
         notes: note || null,
         status: "novo",
+        payment_status: "nao_aplicavel",
       });
     } catch (e) {
       console.error("Falha ao salvar pedido", e);
@@ -110,6 +128,43 @@ const Carrinho = () => {
     }
     toast.success("Pedido enviado!");
     clear();
+    setProcessing(false);
+  };
+
+  const handlePayOnline = async () => {
+    if (items.length === 0) return;
+    if (!validateProfile()) return;
+    setProcessing(true);
+
+    try {
+      const { data: created, error: insertErr } = await supabase.from("orders").insert({
+        customer_name: profile.name,
+        customer_phone: profile.phone,
+        customer_address: profile.address,
+        items: buildItemsPayload() as any,
+        total,
+        payment_method: "mercadopago",
+        notes: note || null,
+        status: "novo",
+        payment_status: "pendente",
+      }).select("id, code").single();
+
+      if (insertErr || !created) throw insertErr || new Error("Erro ao criar pedido");
+
+      const { data, error } = await supabase.functions.invoke("mp-create-preference", {
+        body: { order_id: created.id },
+      });
+      if (error) throw error;
+      if (!data?.checkout_url) throw new Error("Checkout não disponível");
+
+      addOrder({ total, items: items.map((it) => `${it.qty}x ${it.product.name}`) });
+      clear();
+      window.location.href = data.checkout_url;
+    } catch (e: any) {
+      console.error(e);
+      toast.error(e?.message || "Falha ao iniciar pagamento. Avise a loja.");
+      setProcessing(false);
+    }
   };
 
   const totalQty = items.reduce((s, i) => s + i.qty, 0);
@@ -227,6 +282,15 @@ const Carrinho = () => {
           </section>
 
           <section className="mt-5 px-5">
+            <h3 className="mb-2 font-display text-sm font-semibold">Seus dados de entrega</h3>
+            <div className="flex flex-col gap-2">
+              <DataField icon={<User className="h-4 w-4" />} placeholder="Nome completo" value={profile.name} onChange={(v) => setProfile({ name: v })} />
+              <DataField icon={<Phone className="h-4 w-4" />} placeholder="Telefone (WhatsApp)" value={profile.phone} onChange={(v) => setProfile({ phone: v })} />
+              <DataField icon={<MapPin className="h-4 w-4" />} placeholder="Endereço completo" value={profile.address} onChange={(v) => setProfile({ address: v })} />
+            </div>
+          </section>
+
+          <section className="mt-5 px-5">
             <label className="mb-2 block font-display text-sm font-semibold">
               Observação geral
             </label>
@@ -239,6 +303,7 @@ const Carrinho = () => {
             />
           </section>
 
+          {paymentMode === "whatsapp" && (
           <section className="mt-5 px-5">
             <label className="mb-2 block font-display text-sm font-semibold">
               Pagamento
@@ -261,6 +326,7 @@ const Carrinho = () => {
               ))}
             </div>
           </section>
+          )}
 
           <section className="mt-6 px-5">
             <div className="rounded-2xl bg-card p-4 shadow-card">
@@ -280,22 +346,51 @@ const Carrinho = () => {
               </div>
             </div>
 
-            <button
-              onClick={handleSend}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-whatsapp py-4 font-display text-base font-bold text-whatsapp-foreground shadow-card transition-transform active:scale-[0.98]"
-            >
-              <WhatsAppIcon />
-              Enviar pedido no WhatsApp
-            </button>
-            <p className="mt-2 text-center text-[11px] text-muted-foreground">
-              Você será redirecionado ao WhatsApp da loja
-            </p>
+            {paymentMode === "online" ? (
+              <>
+                <button
+                  onClick={handlePayOnline}
+                  disabled={processing}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-primary py-4 font-display text-base font-bold text-primary-foreground shadow-glow transition-transform active:scale-[0.98] disabled:opacity-60"
+                >
+                  <CreditCard className="h-5 w-5" />
+                  {processing ? "Abrindo pagamento..." : "Pagar agora"}
+                </button>
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  Pagamento seguro via Mercado Pago — Pix, cartão ou boleto
+                </p>
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={handleSend}
+                  disabled={processing}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-whatsapp py-4 font-display text-base font-bold text-whatsapp-foreground shadow-card transition-transform active:scale-[0.98] disabled:opacity-60"
+                >
+                  <WhatsAppIcon />
+                  {processing ? "Enviando..." : "Enviar pedido no WhatsApp"}
+                </button>
+                <p className="mt-2 text-center text-[11px] text-muted-foreground">
+                  Você será redirecionado ao WhatsApp da loja
+                </p>
+              </>
+            )}
           </section>
         </>
       )}
     </AppShell>
   );
 };
+
+const DataField = ({ icon, placeholder, value, onChange }: {
+  icon: React.ReactNode; placeholder: string; value: string; onChange: (v: string) => void;
+}) => (
+  <div className="flex items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-soft">
+    <span className="text-muted-foreground">{icon}</span>
+    <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
+      className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+  </div>
+);
 
 const WhatsAppIcon = () => (
   <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">

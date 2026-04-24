@@ -5,7 +5,7 @@ import { Order } from "../lib/queries";
 import { fmtBRL } from "@/lib/format";
 import { StatusBadge } from "./Dashboard";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, CheckCircle2, Loader2, XCircle, MapPin } from "lucide-react";
 
 const STATUS: Order["status"][] = ["novo", "preparo", "finalizado", "cancelado"];
 
@@ -54,7 +54,10 @@ export default function AdminOrders() {
                   <td className="font-mono text-xs">{o.code}</td>
                   <td>{o.customer_name ?? "—"}<div className="text-xs text-admin-muted">{o.customer_phone}</div></td>
                   <td className="text-admin-muted">{(o.items ?? []).length} item(ns)</td>
-                  <td className="font-semibold">{fmtBRL(o.total)}</td>
+                  <td className="font-semibold">
+                    {fmtBRL(o.total)}
+                    <PaymentBadge order={o} />
+                  </td>
                   <td><StatusBadge status={o.status} /></td>
                   <td className="text-admin-muted text-xs">{new Date(o.created_at).toLocaleString("pt-BR")}</td>
                   <td onClick={(e) => e.stopPropagation()}>
@@ -80,6 +83,16 @@ export default function AdminOrders() {
               <div className="rounded-xl bg-admin-soft p-3">
                 <p className="font-semibold">{open.customer_name}</p>
                 <p className="text-admin-muted">{open.customer_phone}</p>
+                {open.customer_address && (
+                  <p className="mt-2 flex items-start gap-1.5 text-admin-muted">
+                    <MapPin className="size-3.5 mt-0.5 flex-shrink-0" />
+                    <span>{open.customer_address}</span>
+                  </p>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <PaymentBadge order={open} />
+                {open.payment_method && <span className="text-xs text-admin-muted">via {open.payment_method}</span>}
               </div>
               <div>
                 <p className="mb-2 text-xs font-semibold uppercase text-admin-muted">Itens</p>
@@ -102,4 +115,18 @@ export default function AdminOrders() {
       )}
     </AdminLayout>
   );
+}
+
+function PaymentBadge({ order }: { order: any }) {
+  const ps = order.payment_status;
+  if (ps === "pago") {
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700"><CheckCircle2 className="size-3" />PAGO</span>;
+  }
+  if (ps === "pendente") {
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"><Loader2 className="size-3 animate-spin" />Aguardando</span>;
+  }
+  if (ps === "falhou") {
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700"><XCircle className="size-3" />Falhou</span>;
+  }
+  return null;
 }
