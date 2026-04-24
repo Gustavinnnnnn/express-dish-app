@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   CreditCard,
+  Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ const NAV = [
   { to: "/admin/ofertas", icon: Tag, label: "Ofertas" },
   { to: "/admin/clientes", icon: Users, label: "Clientes" },
   { to: "/admin/pagamentos", icon: CreditCard, label: "Pagamentos" },
+  { to: "/admin/demo", icon: Sparkles, label: "Modo Demo" },
   { to: "/admin/aparencia", icon: Palette, label: "Aparência" },
   { to: "/admin/configuracoes", icon: Settings, label: "Configurações" },
   { to: "/admin/equipe", icon: UserCog, label: "Equipe" },
