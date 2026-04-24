@@ -85,26 +85,26 @@ export const AdminLayout = ({ children, title }: { children: ReactNode; title?: 
       {/* Main */}
       <div className="min-w-0 lg:pl-64">
         {/* Topbar */}
-        <header className="sticky top-0 z-20 flex min-h-16 flex-wrap items-center gap-3 border-b border-admin-border bg-admin-bg/95 px-4 py-3 backdrop-blur lg:flex-nowrap lg:px-8">
-          <button className="lg:hidden text-admin-fg" onClick={() => setOpen(true)} aria-label="Abrir menu">
+        <header className="sticky top-0 z-20 flex min-h-14 items-center gap-2 border-b border-admin-border bg-admin-bg/95 px-3 py-2 backdrop-blur lg:min-h-16 lg:px-8 lg:py-3">
+          <button className="grid h-9 w-9 place-items-center rounded-lg text-admin-fg hover:bg-admin-soft lg:hidden" onClick={() => setOpen(true)} aria-label="Abrir menu">
             <Menu className="size-5" />
           </button>
           <div className="min-w-0 flex-1">
-            <p className="text-xs text-admin-muted">Painel</p>
-            <h1 className="truncate font-display text-lg font-semibold leading-tight">{title ?? current?.label ?? "Admin"}</h1>
+            <p className="hidden text-xs text-admin-muted sm:block">Painel</p>
+            <h1 className="truncate font-display text-base font-semibold leading-tight lg:text-lg">{title ?? current?.label ?? "Admin"}</h1>
           </div>
-          <div className="flex w-full items-center justify-end gap-2 sm:w-auto">
-          <Button variant="outline" size="sm" asChild className="hidden sm:inline-flex border-admin-border bg-admin-card text-admin-fg hover:bg-admin-soft">
-            <Link to="/" target="_blank"><Eye className="size-4" />Pré-visualizar</Link>
-          </Button>
-          <Button size="sm" asChild className="bg-admin-primary text-white hover:bg-admin-primary/90">
-            <Link to="/" target="_blank"><ExternalLink className="size-4" />Ver loja</Link>
-          </Button>
-          <div className="grid h-9 w-9 place-items-center rounded-full bg-admin-primary text-sm font-semibold text-white">A</div>
+          <div className="flex items-center gap-1.5">
+            <Button variant="outline" size="sm" asChild className="hidden border-admin-border bg-admin-card text-admin-fg hover:bg-admin-soft sm:inline-flex">
+              <Link to="/" target="_blank"><Eye className="size-4" />Pré-visualizar</Link>
+            </Button>
+            <Button size="sm" asChild className="bg-admin-primary text-white hover:bg-admin-primary/90">
+              <Link to="/" target="_blank"><ExternalLink className="size-4" /><span className="hidden sm:inline">Ver loja</span></Link>
+            </Button>
+            <div className="grid h-9 w-9 place-items-center rounded-full bg-admin-primary text-sm font-semibold text-white">A</div>
           </div>
         </header>
 
-        <main className="min-w-0 p-4 lg:p-8">{children}</main>
+        <main className="min-w-0 p-3 sm:p-4 lg:p-8">{children}</main>
       </div>
     </div>
   );

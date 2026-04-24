@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "../AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { StoreSettings } from "../lib/queries";
-import { Save, Eye, EyeOff, ExternalLink, CreditCard } from "lucide-react";
+import { Save, Eye, EyeOff, ExternalLink, CreditCard, Zap, FlaskConical, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "./Categories";
+
+type TestResult = { ok: boolean; message: string; url?: string } | null;
 
 export default function AdminPayments() {
   const [s, setS] = useState<StoreSettings | null>(null);
   const [saving, setSaving] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [creatingPref, setCreatingPref] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<TestResult>(null);
+  const [prefResult, setPrefResult] = useState<TestResult>(null);
 
   useEffect(() => {
     supabase.from("store_settings").select("*").limit(1).maybeSingle().then(({ data }) => setS(data as any));
@@ -27,6 +33,35 @@ export default function AdminPayments() {
     } as any).eq("id", s.id);
     setSaving(false);
     if (error) toast.error(error.message); else toast.success("Credenciais salvas");
+  };
+
+  const callTest = async (mode: "verify" | "preference") => {
+    const setLoading = mode === "verify" ? setVerifying : setCreatingPref;
+    const setResult = mode === "verify" ? setVerifyResult : setPrefResult;
+    setLoading(true);
+    setResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("mp-test", { body: { mode } });
+      if (error) throw error;
+      if (!data?.ok) {
+        setResult({ ok: false, message: data?.error || "Falhou" });
+        toast.error(data?.error || "Teste falhou");
+      } else if (mode === "verify") {
+        setResult({
+          ok: true,
+          message: `Conectado como ${data.nickname || data.email} · ambiente: ${data.environment} · token: ${data.token_type}`,
+        });
+        toast.success("Token válido!");
+      } else {
+        setResult({ ok: true, message: "Preferência criada — abra o link e simule o pagamento", url: data.checkout_url });
+        toast.success("Pedido de teste criado");
+      }
+    } catch (e: any) {
+      setResult({ ok: false, message: e.message || "Erro de rede" });
+      toast.error(e.message || "Erro de rede");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -89,6 +124,48 @@ export default function AdminPayments() {
             <p className="mt-2">No MP: Suas integrações → sua app → Webhooks → adicione a URL acima e marque o evento <strong>payment</strong>.</p>
           </div>
         </div>
+
+        {/* Bloco de testes */}
+        <div className="admin-card space-y-4 p-5">
+          <div className="flex items-start gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-admin-warning/15" style={{ color: "hsl(var(--admin-warning))" }}>
+              <FlaskConical className="size-5" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-semibold">Testar integração</h3>
+              <p className="mt-1 text-sm text-admin-muted">
+                Use estes botões pra confirmar que o token funciona e que o checkout abre.
+                Salve as credenciais antes de testar.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              className="admin-btn admin-btn-outline w-full justify-between"
+              onClick={() => callTest("verify")}
+              disabled={verifying}
+            >
+              <span className="inline-flex items-center gap-2"><Zap className="size-4" /> Testar conexão</span>
+              {verifying && <span className="text-xs">…</span>}
+            </button>
+            <button
+              className="admin-btn admin-btn-primary w-full justify-between"
+              onClick={() => callTest("preference")}
+              disabled={creatingPref}
+            >
+              <span className="inline-flex items-center gap-2"><FlaskConical className="size-4" /> Pedido teste R$1</span>
+              {creatingPref && <span className="text-xs">…</span>}
+            </button>
+          </div>
+
+          {verifyResult && (
+            <ResultBox result={verifyResult} label="Conexão" />
+          )}
+          {prefResult && (
+            <ResultBox result={prefResult} label="Pedido de teste" />
+          )}
+        </div>
       </div>
 
       <div className="mt-6 flex justify-end">
@@ -97,3 +174,27 @@ export default function AdminPayments() {
     </AdminLayout>
   );
 }
+
+function ResultBox({ result, label }: { result: { ok: boolean; message: string; url?: string }; label: string }) {
+  return (
+    <div className={`rounded-lg border p-3 text-sm ${result.ok ? "border-admin-success/40 bg-admin-success/10" : "border-admin-danger/40 bg-admin-danger/10"}`}>
+      <div className="flex items-start gap-2">
+        {result.ok ? (
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" style={{ color: "hsl(var(--admin-success))" }} />
+        ) : (
+          <XCircle className="mt-0.5 size-4 shrink-0" style={{ color: "hsl(var(--admin-danger))" }} />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-admin-fg">{label}: {result.ok ? "OK" : "Falhou"}</p>
+          <p className="mt-0.5 break-words text-admin-muted">{result.message}</p>
+          {result.url && (
+            <a href={result.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-admin-primary hover:underline">
+              Abrir checkout <ExternalLink className="size-3" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+

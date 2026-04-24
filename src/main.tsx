@@ -26,7 +26,8 @@ if (isInIframe || isPreviewHost) {
     navigator.serviceWorker.getRegistrations().then((rs) => rs.forEach((r) => r.unregister()));
   }
 } else if ("serviceWorker" in navigator) {
-  import("virtual:pwa-register").then(({ registerSW }) => {
-    registerSW({ immediate: true });
+  // Registra SW estático (necessário pra browser disparar beforeinstallprompt)
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
   });
 }
