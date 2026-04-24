@@ -16,7 +16,7 @@ export const ProductCard = ({ product }: { product: Product }) => {
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="h-full w-full object-contain"
+            className="h-full w-full object-cover"
           />
           {product.tag && (
             <span className="absolute left-1 top-1 rounded-full bg-primary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-primary-foreground">
@@ -61,7 +61,7 @@ export const ProductChip = ({ product }: { product: Product }) => {
           src={product.image}
           alt={product.name}
           loading="lazy"
-          className="h-full w-full object-contain transition-transform group-hover:scale-105"
+          className="h-full w-full object-cover transition-transform group-hover:scale-105"
         />
       </div>
       <div className="flex flex-col gap-1 px-1 pb-1">

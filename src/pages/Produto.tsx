@@ -125,8 +125,8 @@ const Produto = () => {
 
   return (
     <div className="mx-auto min-h-screen max-w-md bg-background pb-40">
-      <div className="relative bg-card">
-        <img src={product.image} alt={product.name} className="max-h-[28rem] w-full object-contain" />
+      <div className="relative h-[28rem] overflow-hidden bg-card">
+        <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-hero" />
         <button
           onClick={() => navigate(-1)}
