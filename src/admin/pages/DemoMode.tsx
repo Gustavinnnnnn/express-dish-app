@@ -46,8 +46,8 @@ export default function DemoMode() {
     <AdminLayout title="Modo Demonstração">
       <div className="space-y-6">
         {/* Hero */}
-        <Card className="border-admin-border bg-gradient-to-br from-admin-primary/10 via-admin-soft to-transparent p-6">
-          <div className="flex items-start gap-4">
+        <Card className="border-admin-border bg-gradient-to-br from-admin-primary/10 via-admin-soft to-transparent p-4 sm:p-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
             <div className="grid h-12 w-12 place-items-center rounded-xl bg-admin-primary text-white shadow-lg">
               <Sparkles className="size-6" />
             </div>
@@ -63,7 +63,7 @@ export default function DemoMode() {
               size="sm"
               onClick={reset}
               disabled={!!applying}
-              className="border-admin-border bg-white"
+              className="w-full border-admin-border bg-admin-card text-admin-fg hover:bg-admin-soft sm:w-auto"
             >
               <RotateCcw className="size-4" />
               Resetar padrão
@@ -71,15 +71,15 @@ export default function DemoMode() {
           </div>
         </Card>
 
-        <div className="grid gap-6 lg:grid-cols-[1fr,420px]">
+        <div className="grid min-w-0 gap-6 lg:grid-cols-[minmax(0,1fr),420px]">
           {/* Presets */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="font-display text-lg font-semibold">Escolha um layout</h3>
               <span className="text-xs text-admin-muted">{DEMO_PRESETS.length} presets disponíveis</span>
             </div>
 
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid gap-4 xl:grid-cols-2">
               {DEMO_PRESETS.map((p) => {
                 const isActive = active === p.id;
                 const isLoading = applying === p.id;
@@ -104,7 +104,7 @@ export default function DemoMode() {
                       >
                         {p.emoji}
                       </div>
-                      <div className="min-w-0">
+                      <div className="min-w-0 flex-1">
                         <h4 className="truncate font-display text-base font-bold">{p.label}</h4>
                         <p className="truncate text-xs text-admin-muted">{p.settings.store_name}</p>
                       </div>
@@ -132,12 +132,12 @@ export default function DemoMode() {
                       </span>
                     </div>
 
-                    <div className="mt-4 flex gap-2">
+                     <div className="mt-4 flex flex-col gap-2 sm:flex-row">
                       <Button
                         size="sm"
                         onClick={() => apply(p)}
                         disabled={!!applying}
-                        className="flex-1 bg-admin-primary text-white hover:bg-admin-primary/90"
+                          className="w-full flex-1 bg-admin-primary text-white hover:bg-admin-primary/90"
                       >
                         {isLoading ? (
                           <>
@@ -151,7 +151,7 @@ export default function DemoMode() {
                         size="sm"
                         variant="outline"
                         asChild
-                        className="border-admin-border bg-white"
+                         className="w-full border-admin-border bg-admin-card text-admin-fg hover:bg-admin-soft sm:w-auto"
                       >
                         <Link to="/" target="_blank" rel="noreferrer">
                           <Eye className="size-4" />
@@ -166,14 +166,14 @@ export default function DemoMode() {
 
           {/* Preview */}
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="font-display text-lg font-semibold">Pré-visualização</h3>
-              <div className="inline-flex rounded-lg border border-admin-border bg-white p-0.5">
+              <div className="inline-flex w-full rounded-lg border border-admin-border bg-admin-card p-0.5 sm:w-auto">
                 <button
                   onClick={() => setPreviewMode("mobile")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                    previewMode === "mobile" ? "bg-admin-primary text-white" : "text-admin-muted hover:text-admin-fg",
+                     previewMode === "mobile" ? "bg-admin-primary text-white" : "text-admin-muted hover:text-admin-fg",
                   )}
                 >
                   <Smartphone className="size-3.5" /> Mobile
@@ -182,7 +182,7 @@ export default function DemoMode() {
                   onClick={() => setPreviewMode("desktop")}
                   className={cn(
                     "inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors",
-                    previewMode === "desktop" ? "bg-admin-primary text-white" : "text-admin-muted hover:text-admin-fg",
+                     previewMode === "desktop" ? "bg-admin-primary text-white" : "text-admin-muted hover:text-admin-fg",
                   )}
                 >
                   <Monitor className="size-3.5" /> Desktop
@@ -193,7 +193,7 @@ export default function DemoMode() {
             <Card className="overflow-hidden border-admin-border bg-admin-soft p-3">
               <div
                 className={cn(
-                  "mx-auto overflow-hidden rounded-xl border border-admin-border bg-white shadow-sm transition-all",
+                  "mx-auto overflow-hidden rounded-xl border border-admin-border bg-admin-card shadow-sm transition-all",
                   previewMode === "mobile" ? "w-[360px] max-w-full" : "w-full",
                 )}
                 style={{ height: previewMode === "mobile" ? 640 : 520 }}

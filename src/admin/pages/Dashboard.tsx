@@ -50,7 +50,7 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
         {cards.map((c) => (
           <div key={c.label} className="admin-card p-4 lg:p-5">
             <div className="flex items-center gap-3">
@@ -77,7 +77,7 @@ export default function AdminDashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--admin-border))" />
                 <XAxis dataKey="day" stroke="hsl(var(--admin-muted))" fontSize={12} />
                 <YAxis stroke="hsl(var(--admin-muted))" fontSize={12} allowDecimals={false} />
-                <Tooltip contentStyle={{ background: "white", border: "1px solid hsl(var(--admin-border))", borderRadius: 10 }} />
+                <Tooltip contentStyle={{ background: "hsl(var(--admin-card))", color: "hsl(var(--admin-fg))", border: "1px solid hsl(var(--admin-border))", borderRadius: 10 }} />
                 <Line type="monotone" dataKey="pedidos" stroke="hsl(var(--admin-primary))" strokeWidth={2.5} dot={{ r: 4 }} />
               </LineChart>
             </ResponsiveContainer>
