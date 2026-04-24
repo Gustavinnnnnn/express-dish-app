@@ -2,14 +2,20 @@ import { useEffect, useState } from "react";
 import { AdminLayout } from "../AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { StoreSettings } from "../lib/queries";
-import { Save, Eye, EyeOff, ExternalLink, CreditCard } from "lucide-react";
+import { Save, Eye, EyeOff, ExternalLink, CreditCard, Zap, FlaskConical, CheckCircle2, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Field } from "./Categories";
+
+type TestResult = { ok: boolean; message: string; url?: string } | null;
 
 export default function AdminPayments() {
   const [s, setS] = useState<StoreSettings | null>(null);
   const [saving, setSaving] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  const [creatingPref, setCreatingPref] = useState(false);
+  const [verifyResult, setVerifyResult] = useState<TestResult>(null);
+  const [prefResult, setPrefResult] = useState<TestResult>(null);
 
   useEffect(() => {
     supabase.from("store_settings").select("*").limit(1).maybeSingle().then(({ data }) => setS(data as any));
@@ -27,6 +33,35 @@ export default function AdminPayments() {
     } as any).eq("id", s.id);
     setSaving(false);
     if (error) toast.error(error.message); else toast.success("Credenciais salvas");
+  };
+
+  const callTest = async (mode: "verify" | "preference") => {
+    const setLoading = mode === "verify" ? setVerifying : setCreatingPref;
+    const setResult = mode === "verify" ? setVerifyResult : setPrefResult;
+    setLoading(true);
+    setResult(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("mp-test", { body: { mode } });
+      if (error) throw error;
+      if (!data?.ok) {
+        setResult({ ok: false, message: data?.error || "Falhou" });
+        toast.error(data?.error || "Teste falhou");
+      } else if (mode === "verify") {
+        setResult({
+          ok: true,
+          message: `Conectado como ${data.nickname || data.email} · ambiente: ${data.environment} · token: ${data.token_type}`,
+        });
+        toast.success("Token válido!");
+      } else {
+        setResult({ ok: true, message: "Preferência criada — abra o link e simule o pagamento", url: data.checkout_url });
+        toast.success("Pedido de teste criado");
+      }
+    } catch (e: any) {
+      setResult({ ok: false, message: e.message || "Erro de rede" });
+      toast.error(e.message || "Erro de rede");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
