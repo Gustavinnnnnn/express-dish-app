@@ -1,5 +1,6 @@
-import { Download, X, Share, Plus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Download, Plus, Share, Smartphone, X } from "lucide-react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -9,15 +10,23 @@ type BeforeInstallPromptEvent = Event & {
 const DISMISS_KEY = "pwa-install-dismissed";
 
 export const InstallAppButton = () => {
-  const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [dismissed, setDismissed] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [isSecureInstallContext, setIsSecureInstallContext] = useState(false);
 
   useEffect(() => {
     const ua = window.navigator.userAgent;
-    setIsIOS(/iPad|iPhone|iPod/.test(ua) && !(window as any).MSStream);
+    const iosDevice =
+      /iPad|iPhone|iPod/.test(ua) ||
+      (window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1);
+
+    setIsIOS(iosDevice);
+    setIsSecureInstallContext(
+      window.isSecureContext || window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1",
+    );
 
     const isStandalone =
       window.matchMedia?.("(display-mode: standalone)").matches ||
@@ -35,9 +44,13 @@ export const InstallAppButton = () => {
 
     const onBip = (e: Event) => {
       e.preventDefault();
-      setDeferred(e as BeforeInstallPromptEvent);
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
-    const onInstalled = () => setInstalled(true);
+    const onInstalled = () => {
+      setInstalled(true);
+      setDeferredPrompt(null);
+      setShowHelp(false);
+    };
 
     window.addEventListener("beforeinstallprompt", onBip);
     window.addEventListener("appinstalled", onInstalled);
@@ -47,27 +60,30 @@ export const InstallAppButton = () => {
     };
   }, []);
 
-  if (installed || dismissed) return null;
+  const canShowNativeInstall = Boolean(deferredPrompt) && !isIOS && isSecureInstallContext;
+  const canShowIosFallback = isIOS && isSecureInstallContext;
+
+  if (installed || dismissed || (!canShowNativeInstall && !canShowIosFallback)) return null;
 
   const handleClick = async () => {
-    if (deferred) {
-      try {
-        await deferred.prompt();
-        const choice = await deferred.userChoice;
-        if (choice.outcome === "dismissed") {
-          localStorage.setItem(DISMISS_KEY, String(Date.now()));
-          setDismissed(true);
-        }
-      } finally {
-        setDeferred(null);
+    if (!deferredPrompt) return;
+
+    try {
+      await deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+
+      if (choice.outcome === "accepted") {
+        setInstalled(true);
+      } else {
+        localStorage.setItem(DISMISS_KEY, String(Date.now()));
+        setDismissed(true);
       }
-      return;
+    } finally {
+      setDeferredPrompt(null);
     }
-    // Sem prompt nativo (iOS Safari, desktop sem suporte ou já dispensado pelo browser)
-    setShowHelp(true);
   };
 
-  const dismiss = (e: React.MouseEvent) => {
+  const dismiss = (e: MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
     setDismissed(true);
@@ -75,67 +91,83 @@ export const InstallAppButton = () => {
 
   return (
     <>
-      <div className="safe-top sticky top-0 z-30 bg-gradient-primary px-4 py-2 text-primary-foreground shadow-glow">
-        <div className="mx-auto flex max-w-md items-center gap-3">
-          <Download className="h-4 w-4 shrink-0" />
-          <button onClick={handleClick} className="flex-1 text-left text-sm font-semibold">
-            Baixe nosso aplicativo
-            <span className="ml-1 font-normal opacity-90">— acesso rápido na tela inicial</span>
+      <motion.div
+        initial={{ opacity: 0, y: -16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.32 }}
+        className="safe-top sticky top-0 z-30 px-4 pt-2"
+      >
+        <div className="mx-auto flex max-w-md items-center gap-3 rounded-2xl border border-border/60 bg-card/95 px-4 py-3 shadow-card backdrop-blur-xl">
+          <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-gradient-primary shadow-glow">
+            {canShowNativeInstall ? (
+              <Download className="h-5 w-5 text-primary-foreground" />
+            ) : (
+              <Smartphone className="h-5 w-5 text-primary-foreground" />
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-semibold text-foreground">Instale nosso app</p>
+            <p className="text-xs text-muted-foreground">
+              {canShowNativeInstall ? "Abra mais rápido e peça com um toque." : "Adicione na tela inicial do seu iPhone."}
+            </p>
+          </div>
+
+          <button
+            id={canShowNativeInstall ? "installBtn" : undefined}
+            onClick={canShowNativeInstall ? handleClick : () => setShowHelp(true)}
+            className="shrink-0 rounded-full bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground shadow-glow transition-transform duration-200 hover:scale-[1.02]"
+          >
+            {canShowNativeInstall ? "Instalar agora" : "Ver como"}
           </button>
+
           <button
             onClick={dismiss}
             aria-label="Dispensar"
-            className="grid h-7 w-7 place-items-center rounded-full bg-black/20 hover:bg-black/30"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-secondary text-secondary-foreground transition-colors hover:bg-secondary/80"
           >
             <X className="h-3.5 w-3.5" />
           </button>
         </div>
-      </div>
+      </motion.div>
 
-      {showHelp && (
+      {showHelp && canShowIosFallback && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-4 sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-background/80 p-4 backdrop-blur-sm sm:items-center"
           onClick={() => setShowHelp(false)}
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="w-full max-w-md rounded-2xl bg-card p-5 shadow-card"
+            className="w-full max-w-md rounded-3xl border border-border/60 bg-card p-5 shadow-card"
           >
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="font-display text-lg font-bold">Instalar aplicativo</h3>
+              <h3 className="font-display text-lg font-bold">Adicionar ao iPhone</h3>
               <button
                 onClick={() => setShowHelp(false)}
-                className="grid h-8 w-8 place-items-center rounded-full bg-muted hover:bg-muted/70"
+                className="grid h-8 w-8 place-items-center rounded-full bg-secondary text-secondary-foreground hover:bg-secondary/80"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
-            {isIOS ? (
-              <ol className="space-y-2 text-sm text-muted-foreground">
-                <li className="flex items-start gap-2">
-                  <span className="font-bold text-foreground">1.</span>
-                  <span>
-                    Toque em <Share className="inline h-4 w-4 align-text-bottom" /> <b>Compartilhar</b> na barra do Safari.
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold text-foreground">2.</span>
-                  <span>
-                    Escolha <Plus className="inline h-4 w-4 align-text-bottom" /> <b>Adicionar à Tela de Início</b>.
-                  </span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold text-foreground">3.</span>
-                  <span>Confirme em <b>Adicionar</b> — pronto, vira app!</span>
-                </li>
-              </ol>
-            ) : (
-              <ol className="space-y-2 text-sm text-muted-foreground">
-                <li>• No Chrome/Edge: abra o menu (⋮) e toque em <b>Instalar aplicativo</b>.</li>
-                <li>• Se não aparecer, navegue um pouco pelo site e tente de novo.</li>
-                <li>• Em desktop: ícone de instalar na barra de endereço.</li>
-              </ol>
-            )}
+            <p className="mb-4 text-sm text-muted-foreground">No iPhone a instalação é feita pelo Safari, então deixei o atalho rápido aqui.</p>
+            <ol className="space-y-3 text-sm text-muted-foreground">
+              <li className="flex items-start gap-3 rounded-2xl bg-secondary/70 px-3 py-3">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">1</span>
+                <span>
+                  Toque em <Share className="inline h-4 w-4 align-text-bottom" /> <b>Compartilhar</b> no Safari.
+                </span>
+              </li>
+              <li className="flex items-start gap-3 rounded-2xl bg-secondary/70 px-3 py-3">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">2</span>
+                <span>
+                  Escolha <Plus className="inline h-4 w-4 align-text-bottom" /> <b>Adicionar à Tela de Início</b>.
+                </span>
+              </li>
+              <li className="flex items-start gap-3 rounded-2xl bg-secondary/70 px-3 py-3">
+                <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">3</span>
+                <span>Confirme em <b>Adicionar</b> para finalizar.</span>
+              </li>
+            </ol>
           </div>
         </div>
       )}
