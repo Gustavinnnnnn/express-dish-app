@@ -124,6 +124,48 @@ export default function AdminPayments() {
             <p className="mt-2">No MP: Suas integrações → sua app → Webhooks → adicione a URL acima e marque o evento <strong>payment</strong>.</p>
           </div>
         </div>
+
+        {/* Bloco de testes */}
+        <div className="admin-card space-y-4 p-5">
+          <div className="flex items-start gap-3">
+            <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-admin-warning/15" style={{ color: "hsl(var(--admin-warning))" }}>
+              <FlaskConical className="size-5" />
+            </div>
+            <div className="min-w-0">
+              <h3 className="font-semibold">Testar integração</h3>
+              <p className="mt-1 text-sm text-admin-muted">
+                Use estes botões pra confirmar que o token funciona e que o checkout abre.
+                Salve as credenciais antes de testar.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <button
+              className="admin-btn admin-btn-outline w-full justify-between"
+              onClick={() => callTest("verify")}
+              disabled={verifying}
+            >
+              <span className="inline-flex items-center gap-2"><Zap className="size-4" /> Testar conexão</span>
+              {verifying && <span className="text-xs">…</span>}
+            </button>
+            <button
+              className="admin-btn admin-btn-primary w-full justify-between"
+              onClick={() => callTest("preference")}
+              disabled={creatingPref}
+            >
+              <span className="inline-flex items-center gap-2"><FlaskConical className="size-4" /> Pedido teste R$1</span>
+              {creatingPref && <span className="text-xs">…</span>}
+            </button>
+          </div>
+
+          {verifyResult && (
+            <ResultBox result={verifyResult} label="Conexão" />
+          )}
+          {prefResult && (
+            <ResultBox result={prefResult} label="Pedido de teste" />
+          )}
+        </div>
       </div>
 
       <div className="mt-6 flex justify-end">
@@ -132,3 +174,27 @@ export default function AdminPayments() {
     </AdminLayout>
   );
 }
+
+function ResultBox({ result, label }: { result: { ok: boolean; message: string; url?: string }; label: string }) {
+  return (
+    <div className={`rounded-lg border p-3 text-sm ${result.ok ? "border-admin-success/40 bg-admin-success/10" : "border-admin-danger/40 bg-admin-danger/10"}`}>
+      <div className="flex items-start gap-2">
+        {result.ok ? (
+          <CheckCircle2 className="mt-0.5 size-4 shrink-0" style={{ color: "hsl(var(--admin-success))" }} />
+        ) : (
+          <XCircle className="mt-0.5 size-4 shrink-0" style={{ color: "hsl(var(--admin-danger))" }} />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-admin-fg">{label}: {result.ok ? "OK" : "Falhou"}</p>
+          <p className="mt-0.5 break-words text-admin-muted">{result.message}</p>
+          {result.url && (
+            <a href={result.url} target="_blank" rel="noreferrer" className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-admin-primary hover:underline">
+              Abrir checkout <ExternalLink className="size-3" />
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
