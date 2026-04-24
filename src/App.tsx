@@ -21,6 +21,7 @@ import AdminCustomers from "./admin/pages/Customers.tsx";
 import AdminAppearance from "./admin/pages/Appearance.tsx";
 import AdminSettings from "./admin/pages/Settings.tsx";
 import AdminTeam from "./admin/pages/Team.tsx";
+import AdminPayments from "./admin/pages/Payments.tsx";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => (
           <Route path="/admin/clientes" element={<AdminCustomers />} />
           <Route path="/admin/aparencia" element={<AdminAppearance />} />
           <Route path="/admin/configuracoes" element={<AdminSettings />} />
+          <Route path="/admin/pagamentos" element={<AdminPayments />} />
           <Route path="/admin/equipe" element={<AdminTeam />} />
 
           <Route path="*" element={<NotFound />} />

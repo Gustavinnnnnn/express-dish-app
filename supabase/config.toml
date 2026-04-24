@@ -1,1 +1,7 @@
 project_id = "dskbzejuffkkucagiapu"
+
+[functions.mp-create-preference]
+verify_jwt = false
+
+[functions.mp-webhook]
+verify_jwt = false
