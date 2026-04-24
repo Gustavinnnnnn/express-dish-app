@@ -1,12 +1,13 @@
 import { useMemo, useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
+import { Search, Tag } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { ProductCard } from "@/components/ProductCard";
 import { useStoreData } from "@/store/storeData";
+import { brl } from "@/lib/format";
 
 const Explorar = () => {
-  const { categories, products, loading } = useStoreData();
+  const { categories, products, offers, loading } = useStoreData();
   const [params, setParams] = useSearchParams();
   const initialCat = params.get("cat") ?? "all";
   const [active, setActive] = useState<string>(initialCat);

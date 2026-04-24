@@ -75,6 +75,48 @@ const Index = () => {
         </Link>
       </motion.section>
 
+      {/* Ofertas em destaque */}
+      {offers.length > 0 && (
+        <section className="mt-7">
+          <div className="flex items-center justify-between px-5">
+            <h3 className="flex items-center gap-1.5 font-display text-lg font-bold">
+              <Tag className="h-4 w-4 text-primary" /> Ofertas
+            </h3>
+            <Link to="/ofertas" className="text-xs font-medium text-primary">Ver todas</Link>
+          </div>
+          <div className="no-scrollbar mt-3 flex gap-3 overflow-x-auto px-5 pb-2">
+            {offers.slice(0, 6).map((o) => (
+              <Link
+                key={o.id}
+                to={o.product_id ? `/produto/${o.product_id}` : "/ofertas"}
+                className="relative flex w-56 flex-shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-card shadow-card"
+              >
+                <div className="relative h-28 w-full bg-card">
+                  {o.image_url ? (
+                    <img src={o.image_url} alt={o.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-3xl">🏷️</div>
+                  )}
+                  <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary-foreground shadow-glow">
+                    Oferta
+                  </span>
+                </div>
+                <div className="p-3">
+                  <p className="font-display text-sm font-bold leading-tight line-clamp-1">{o.title}</p>
+                  {o.subtitle && <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{o.subtitle}</p>}
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="font-display text-base font-extrabold text-primary">{brl(Number(o.price))}</span>
+                    {o.old_price && Number(o.old_price) > Number(o.price) && (
+                      <span className="text-xs text-muted-foreground line-through">{brl(Number(o.old_price))}</span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Categorias */}
       {categories.length > 0 && (
         <section className="mt-7">
