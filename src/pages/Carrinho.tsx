@@ -118,6 +118,7 @@ const Carrinho = () => {
     // Persiste o pedido no banco — aparece em /admin/pedidos em tempo real
     try {
       await supabase.from("orders").insert({
+        user_id: user?.id ?? null,
         customer_name: profile.name || null,
         customer_phone: profile.phone || null,
         customer_address: profile.address || null,
@@ -128,6 +129,10 @@ const Carrinho = () => {
         status: "novo",
         payment_status: "nao_aplicavel",
       });
+      // Atualiza profile do usuário logado pra próximo pedido
+      if (user) {
+        updateProfile({ name: profile.name, phone: profile.phone, address: profile.address });
+      }
     } catch (e) {
       console.error("Falha ao salvar pedido", e);
     }
@@ -153,6 +158,7 @@ const Carrinho = () => {
 
     try {
       const { data: created, error: insertErr } = await supabase.from("orders").insert({
+        user_id: user?.id ?? null,
         customer_name: profile.name,
         customer_phone: profile.phone,
         customer_address: profile.address,
@@ -165,6 +171,10 @@ const Carrinho = () => {
       }).select("id, code").single();
 
       if (insertErr || !created) throw insertErr || new Error("Erro ao criar pedido");
+
+      if (user) {
+        updateProfile({ name: profile.name, phone: profile.phone, address: profile.address });
+      }
 
       const { data, error } = await supabase.functions.invoke("mp-create-preference", {
         body: { order_id: created.id },
