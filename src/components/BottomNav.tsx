@@ -1,12 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { Home, Compass, Tag, ShoppingBag, User } from "lucide-react";
+import { Home, Compass, Receipt, ShoppingBag, User } from "lucide-react";
 import { useCart } from "@/store/cart";
 import { motion, AnimatePresence } from "framer-motion";
 
 const items = [
   { to: "/", label: "Início", icon: Home, end: true },
   { to: "/explorar", label: "Explorar", icon: Compass },
-  { to: "/ofertas", label: "Ofertas", icon: Tag },
+  { to: "/pedidos", label: "Pedidos", icon: Receipt },
   { to: "/carrinho", label: "Carrinho", icon: ShoppingBag, badge: true },
   { to: "/perfil", label: "Perfil", icon: User },
 ];
@@ -34,10 +34,7 @@ export const BottomNav = () => {
                 {({ isActive }) => (
                   <>
                     <div className="relative">
-                      <Icon
-                        className="h-[22px] w-[22px]"
-                        strokeWidth={isActive ? 2.4 : 2}
-                      />
+                      <Icon className="h-[22px] w-[22px]" strokeWidth={isActive ? 2.4 : 2} />
                       <AnimatePresence>
                         {badge && count > 0 && (
                           <motion.span

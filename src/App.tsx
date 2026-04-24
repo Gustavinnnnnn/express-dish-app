@@ -9,6 +9,8 @@ import Ofertas from "./pages/Ofertas.tsx";
 import Carrinho from "./pages/Carrinho.tsx";
 import Perfil from "./pages/Perfil.tsx";
 import Produto from "./pages/Produto.tsx";
+import Pedidos from "./pages/Pedidos.tsx";
+import Auth from "./pages/Auth.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
 import "./admin/admin.css";
@@ -37,7 +39,9 @@ const App = () => (
           <Route path="/explorar" element={<Explorar />} />
           <Route path="/ofertas" element={<Ofertas />} />
           <Route path="/carrinho" element={<Carrinho />} />
+          <Route path="/pedidos" element={<Pedidos />} />
           <Route path="/perfil" element={<Perfil />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/produto/:id" element={<Produto />} />
 
           <Route path="/admin" element={<AdminDashboard />} />
