@@ -261,6 +261,14 @@ export const DEMO_PRESETS: DemoPreset[] = [
 
 export const DEFAULT_PRESET_ID = "acai";
 
+const getLightness = (hsl: string) => {
+  const parts = hsl.trim().split(/\s+/);
+  const light = parts[2] ?? "50%";
+  return Number.parseFloat(light.replace("%", ""));
+};
+
+const withAlpha = (hsl: string, alpha: number) => `hsl(${hsl} / ${alpha})`;
+
 /** Aplica um tema ao :root via CSS variables. Não toca no admin (admin-scope tem seu próprio tema). */
 export function applyThemeVars(theme: Partial<DemoTheme> | null | undefined) {
   if (!theme) return;
@@ -281,16 +289,53 @@ export function applyThemeVars(theme: Partial<DemoTheme> | null | undefined) {
     const v = theme[k];
     if (v) root.style.setProperty(map[k], v);
   });
-  // Derivados úteis
-  if (theme.primary) {
-    root.style.setProperty("--ring", theme.primary);
-    root.style.setProperty("--accent", theme.accent ?? theme.primary);
-  }
-  if (theme.card) root.style.setProperty("--popover", theme.card);
-  if (theme.card_foreground) root.style.setProperty("--popover-foreground", theme.card_foreground);
-  if (theme.muted) {
-    root.style.setProperty("--secondary", theme.muted);
-    root.style.setProperty("--input", theme.muted);
-  }
-  if (theme.foreground) root.style.setProperty("--secondary-foreground", theme.foreground);
+
+  const background = theme.background ?? "270 30% 8%";
+  const foreground = theme.foreground ?? "35 30% 96%";
+  const card = theme.card ?? background;
+  const cardForeground = theme.card_foreground ?? foreground;
+  const muted = theme.muted ?? card;
+  const primary = theme.primary ?? theme.accent ?? "280 75% 55%";
+  const accent = theme.accent ?? primary;
+  const isLight = getLightness(background) >= 82;
+  const accentForeground = getLightness(accent) >= 62 ? "30 25% 12%" : "0 0% 100%";
+
+  root.style.setProperty("--ring", primary);
+  root.style.setProperty("--accent", accent);
+  root.style.setProperty("--accent-foreground", accentForeground);
+  root.style.setProperty("--primary-glow", accent);
+  root.style.setProperty("--popover", card);
+  root.style.setProperty("--popover-foreground", cardForeground);
+  root.style.setProperty("--secondary", muted);
+  root.style.setProperty("--secondary-foreground", foreground);
+  root.style.setProperty("--input", isLight ? theme.background ?? muted : muted);
+  root.style.setProperty(
+    "--gradient-primary",
+    `linear-gradient(135deg, hsl(${primary}), hsl(${accent}))`,
+  );
+  root.style.setProperty(
+    "--gradient-card",
+    `linear-gradient(160deg, hsl(${card}) 0%, hsl(${background}) 100%)`,
+  );
+  root.style.setProperty(
+    "--gradient-hero",
+    `linear-gradient(180deg, ${withAlpha(background, isLight ? 0.04 : 0)} 0%, ${withAlpha(background, isLight ? 0.42 : 0.45)} 48%, ${withAlpha(background, isLight ? 0.96 : 0.92)} 100%)`,
+  );
+  root.style.setProperty(
+    "--shadow-glow",
+    `0 10px 36px -12px ${withAlpha(primary, isLight ? 0.3 : 0.55)}`,
+  );
+  root.style.setProperty(
+    "--shadow-card",
+    isLight
+      ? "0 14px 34px -18px hsl(220 30% 18% / 0.16)"
+      : "0 12px 30px -16px hsl(220 45% 3% / 0.58)",
+  );
+  root.style.setProperty(
+    "--shadow-soft",
+    isLight
+      ? "0 4px 16px hsl(220 22% 20% / 0.1)"
+      : "0 4px 16px hsl(220 45% 3% / 0.38)",
+  );
+  root.style.colorScheme = isLight ? "light" : "dark";
 }

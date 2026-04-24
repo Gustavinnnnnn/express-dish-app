@@ -52,34 +52,36 @@ export default function AdminOffers() {
       </div>
 
       <div className="admin-card overflow-hidden">
-        <table className="admin-table">
-          <thead><tr><th>Oferta</th><th>Produto</th><th>Preço</th><th>De</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {items.map((o) => (
-              <tr key={o.id}>
-                <td><div className="font-medium">{o.title}</div><div className="text-xs text-admin-muted">{o.subtitle}</div></td>
-                <td className="text-admin-muted">{products.find((p) => p.id === o.product_id)?.name ?? "—"}</td>
-                <td className="font-semibold">{fmtBRL(o.price)}</td>
-                <td className="text-admin-muted line-through">{o.old_price ? fmtBRL(o.old_price) : "—"}</td>
-                <td>{o.active ? "Ativa" : "Inativa"}</td>
-                <td>
-                  <div className="flex items-center justify-end gap-1">
-                    <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(o)}><Pencil className="size-4" /></button>
-                    <button className="admin-btn admin-btn-ghost text-red-500" onClick={() => remove(o.id)}><Trash2 className="size-4" /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && <tr><td colSpan={6} className="text-center text-admin-muted">Nenhuma oferta</td></tr>}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead><tr><th>Oferta</th><th>Produto</th><th>Preço</th><th>De</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {items.map((o) => (
+                <tr key={o.id}>
+                  <td><div className="font-medium">{o.title}</div><div className="text-xs text-admin-muted">{o.subtitle}</div></td>
+                  <td className="text-admin-muted">{products.find((p) => p.id === o.product_id)?.name ?? "—"}</td>
+                  <td className="font-semibold">{fmtBRL(o.price)}</td>
+                  <td className="text-admin-muted line-through">{o.old_price ? fmtBRL(o.old_price) : "—"}</td>
+                  <td>{o.active ? "Ativa" : "Inativa"}</td>
+                  <td>
+                    <div className="flex items-center justify-end gap-1">
+                      <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(o)}><Pencil className="size-4" /></button>
+                      <button className="admin-btn admin-btn-danger" onClick={() => remove(o.id)}><Trash2 className="size-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && <tr><td colSpan={6} className="text-center text-admin-muted">Nenhuma oferta</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {edit && (
         <Modal title={edit.id ? "Editar oferta" : "Nova oferta"} onClose={() => setEdit(null)} onSave={save}>
           <Field label="Título"><input className="admin-input" value={edit.title ?? ""} onChange={(e) => setEdit({ ...edit, title: e.target.value })} /></Field>
           <Field label="Subtítulo"><input className="admin-input" value={edit.subtitle ?? ""} onChange={(e) => setEdit({ ...edit, subtitle: e.target.value })} /></Field>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Preço"><input type="number" step="0.10" className="admin-input" value={edit.price ?? 0} onChange={(e) => setEdit({ ...edit, price: parseFloat(e.target.value) })} /></Field>
             <Field label="Preço antigo"><input type="number" step="0.10" className="admin-input" value={edit.old_price ?? ""} onChange={(e) => setEdit({ ...edit, old_price: e.target.value ? parseFloat(e.target.value) : undefined })} /></Field>
           </div>

@@ -35,25 +35,27 @@ export default function AdminCategories() {
       </div>
 
       <div className="admin-card overflow-hidden">
-        <table className="admin-table">
-          <thead><tr><th>Ordem</th><th>Categoria</th><th>Status</th><th></th></tr></thead>
-          <tbody>
-            {items.map((c) => (
-              <tr key={c.id}>
-                <td className="text-admin-muted">{c.position}</td>
-                <td><span className="text-2xl mr-2">{c.emoji}</span>{c.name}</td>
-                <td>{c.active ? "Ativa" : "Inativa"}</td>
-                <td>
-                  <div className="flex items-center justify-end gap-1">
-                    <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(c)}><Pencil className="size-4" /></button>
-                    <button className="admin-btn admin-btn-ghost text-red-500" onClick={() => remove(c.id)}><Trash2 className="size-4" /></button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-            {items.length === 0 && <tr><td colSpan={4} className="text-center text-admin-muted">Nenhuma categoria</td></tr>}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead><tr><th>Ordem</th><th>Categoria</th><th>Status</th><th></th></tr></thead>
+            <tbody>
+              {items.map((c) => (
+                <tr key={c.id}>
+                  <td className="text-admin-muted">{c.position}</td>
+                  <td><span className="mr-2 text-2xl">{c.emoji}</span>{c.name}</td>
+                  <td>{c.active ? "Ativa" : "Inativa"}</td>
+                  <td>
+                    <div className="flex items-center justify-end gap-1">
+                      <button className="admin-btn admin-btn-ghost" onClick={() => setEdit(c)}><Pencil className="size-4" /></button>
+                      <button className="admin-btn admin-btn-danger" onClick={() => remove(c.id)}><Trash2 className="size-4" /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {items.length === 0 && <tr><td colSpan={4} className="text-center text-admin-muted">Nenhuma categoria</td></tr>}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {edit && (

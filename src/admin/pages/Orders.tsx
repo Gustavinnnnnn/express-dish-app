@@ -120,13 +120,13 @@ export default function AdminOrders() {
 function PaymentBadge({ order }: { order: any }) {
   const ps = order.payment_status;
   if (ps === "pago") {
-    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-bold text-green-700"><CheckCircle2 className="size-3" />PAGO</span>;
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "hsl(var(--admin-success) / 0.15)", color: "hsl(var(--admin-success))" }}><CheckCircle2 className="size-3" />PAGO</span>;
   }
   if (ps === "pendente") {
-    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700"><Loader2 className="size-3 animate-spin" />Aguardando</span>;
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "hsl(var(--admin-warning) / 0.15)", color: "hsl(var(--admin-warning))" }}><Loader2 className="size-3 animate-spin" />Aguardando</span>;
   }
   if (ps === "falhou") {
-    return <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold text-red-700"><XCircle className="size-3" />Falhou</span>;
+    return <span className="ml-2 inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "hsl(var(--admin-danger) / 0.15)", color: "hsl(var(--admin-danger))" }}><XCircle className="size-3" />Falhou</span>;
   }
   return null;
 }

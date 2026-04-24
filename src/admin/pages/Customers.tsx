@@ -21,21 +21,23 @@ export default function AdminCustomers() {
   return (
     <AdminLayout title="Clientes">
       <div className="admin-card overflow-hidden">
-        <table className="admin-table">
-          <thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Pedidos</th><th>Cadastrado</th></tr></thead>
-          <tbody>
-            {items.length === 0 && <tr><td colSpan={5} className="text-center text-admin-muted">Nenhum cliente cadastrado ainda</td></tr>}
-            {items.map((c) => (
-              <tr key={c.id}>
-                <td className="font-medium">{c.name}</td>
-                <td>{c.phone ?? "—"}</td>
-                <td className="text-admin-muted">{c.address ?? "—"}</td>
-                <td><span className="admin-badge" style={{ background: "hsl(var(--admin-primary) / 0.12)", color: "hsl(var(--admin-primary))" }}>{counts[c.id] ?? 0}</span></td>
-                <td className="text-admin-muted text-xs">{new Date(c.created_at).toLocaleDateString("pt-BR")}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <div className="overflow-x-auto">
+          <table className="admin-table">
+            <thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Pedidos</th><th>Cadastrado</th></tr></thead>
+            <tbody>
+              {items.length === 0 && <tr><td colSpan={5} className="text-center text-admin-muted">Nenhum cliente cadastrado ainda</td></tr>}
+              {items.map((c) => (
+                <tr key={c.id}>
+                  <td className="font-medium">{c.name}</td>
+                  <td>{c.phone ?? "—"}</td>
+                  <td className="text-admin-muted">{c.address ?? "—"}</td>
+                  <td><span className="admin-badge" style={{ background: "hsl(var(--admin-primary) / 0.12)", color: "hsl(var(--admin-primary))" }}>{counts[c.id] ?? 0}</span></td>
+                  <td className="text-admin-muted text-xs">{new Date(c.created_at).toLocaleDateString("pt-BR")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AdminLayout>
   );

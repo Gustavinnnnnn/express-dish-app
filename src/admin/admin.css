@@ -1,6 +1,6 @@
-/* Admin SaaS theme — light premium */
+/* Admin SaaS theme — dark premium */
 .admin-scope {
-  --admin-bg: 0 0% 100%;
+  --admin-bg: 222 28% 9%;
   --admin-fg: 0 0% 100%;
   --admin-muted: 220 12% 75%;
   --admin-border: 222 20% 22%;
@@ -14,7 +14,7 @@
   --admin-soft: 222 22% 14%;
 
   font-family: 'Inter', system-ui, sans-serif;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 .admin-scope .bg-admin-bg { background-color: hsl(var(--admin-bg)); }
@@ -34,7 +34,7 @@
   background: hsl(var(--admin-card));
   border: 1px solid hsl(var(--admin-border));
   border-radius: 14px;
-  box-shadow: 0 1px 2px hsl(220 20% 0% / 0.04);
+  box-shadow: 0 16px 36px -24px hsl(220 40% 2% / 0.65);
 }
 
 .admin-input {
@@ -72,19 +72,40 @@
 /* Force dark surface on modal/drawer panels (they were hardcoded bg-white) */
 .admin-scope .bg-white { background-color: hsl(var(--admin-card)) !important; color: hsl(var(--admin-fg)); }
 
-/* Topbar sits on white page bg — keep its text dark */
+/* Topbar and admin text stay white on dark surfaces */
 .admin-scope header.bg-admin-bg\/80,
-.admin-scope header { color: hsl(222 30% 12%); }
-.admin-scope header .text-admin-fg { color: hsl(222 30% 12%) !important; }
-.admin-scope header .text-admin-muted { color: hsl(220 15% 35%) !important; }
+.admin-scope header { color: hsl(var(--admin-fg)); }
+.admin-scope header .text-admin-fg { color: hsl(var(--admin-fg)) !important; }
+.admin-scope header .text-admin-muted { color: hsl(var(--admin-muted)) !important; }
 
-/* Outline buttons on white topbar */
-.admin-scope header .admin-btn-outline { background: white; color: hsl(222 30% 12%); border-color: hsl(220 15% 85%); }
-.admin-scope header .admin-btn-outline:hover { background: hsl(220 20% 96%); }
+/* Outline buttons on dark topbar */
+.admin-scope header .admin-btn-outline { background: hsl(var(--admin-card)); color: hsl(var(--admin-fg)); border-color: hsl(var(--admin-border)); }
+.admin-scope header .admin-btn-outline:hover { background: hsl(var(--admin-soft)); }
 
 /* Mobile menu button on white bg */
-.admin-scope header button[aria-label="Abrir menu"] { color: hsl(222 30% 12%); }
+.admin-scope header button[aria-label="Abrir menu"] { color: hsl(var(--admin-fg)); }
 
 /* Empty / loading text inside cards */
 .admin-scope .text-admin-muted { color: hsl(var(--admin-muted)); }
+
+.admin-scope .admin-table { min-width: 640px; }
+.admin-scope .admin-table th,
+.admin-scope .admin-table td { white-space: nowrap; }
+
+.admin-scope select.admin-input option {
+  background: hsl(var(--admin-card));
+  color: hsl(var(--admin-fg));
+}
+
+@media (max-width: 767px) {
+  .admin-scope {
+    --admin-muted: 220 10% 78%;
+  }
+
+  .admin-card {
+    border-radius: 12px;
+  }
+
+  .admin-scope .admin-table { min-width: 720px; }
+}
 

@@ -32,7 +32,7 @@ export default function AdminPayments() {
   return (
     <AdminLayout title="Pagamentos">
       <div className="grid gap-5">
-        <div className="admin-card p-5">
+          <div className="admin-card p-5">
           <div className="flex items-start gap-3">
             <div className="grid size-10 place-items-center rounded-xl bg-admin-primary/10 text-admin-primary flex-shrink-0">
               <CreditCard className="size-5" />
@@ -50,8 +50,8 @@ export default function AdminPayments() {
           </div>
         </div>
 
-        <div className="admin-card space-y-4 p-5">
-          <div className="flex items-center justify-between">
+          <div className="admin-card space-y-4 p-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="font-semibold">Credenciais do Mercado Pago</h3>
             <a href="https://www.mercadopago.com.br/developers/panel/app" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs font-medium text-admin-primary hover:underline">
               Onde pegar? <ExternalLink className="size-3" />
@@ -81,9 +81,9 @@ export default function AdminPayments() {
             </div>
           </Field>
 
-          <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-900">
+          <div className="rounded-lg border border-admin-border bg-admin-soft p-3 text-xs text-admin-fg">
             <strong>Webhook (configure no painel do Mercado Pago):</strong>
-            <code className="mt-1 block break-all rounded bg-white/60 p-2 font-mono text-[11px]">
+            <code className="mt-1 block break-all rounded bg-admin-card p-2 font-mono text-[11px] text-admin-fg">
               {import.meta.env.VITE_SUPABASE_URL}/functions/v1/mp-webhook
             </code>
             <p className="mt-2">No MP: Suas integrações → sua app → Webhooks → adicione a URL acima e marque o evento <strong>payment</strong>.</p>
