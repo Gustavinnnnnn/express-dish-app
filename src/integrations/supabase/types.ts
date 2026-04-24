@@ -263,6 +263,7 @@ export type Database = {
           primary_color: string
           store_name: string
           tagline: string | null
+          theme: Json
           updated_at: string
           whatsapp: string | null
         }
@@ -283,6 +284,7 @@ export type Database = {
           primary_color?: string
           store_name?: string
           tagline?: string | null
+          theme?: Json
           updated_at?: string
           whatsapp?: string | null
         }
@@ -303,6 +305,7 @@ export type Database = {
           primary_color?: string
           store_name?: string
           tagline?: string | null
+          theme?: Json
           updated_at?: string
           whatsapp?: string | null
         }

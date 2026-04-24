@@ -1,5 +1,18 @@
-// Presets de demonstração. Cada preset = configuração completa da loja.
-// Aplicação substitui categorias/produtos/ofertas e atualiza store_settings.
+// Presets de demonstração. Cada preset inclui paleta completa (background, foreground,
+// card, primary, etc.), conteúdo (categorias/produtos/ofertas) e metadados da loja.
+
+export type DemoTheme = {
+  background: string;        // HSL "h s% l%"
+  foreground: string;
+  card: string;
+  card_foreground: string;
+  muted: string;
+  muted_foreground: string;
+  border: string;
+  primary: string;
+  primary_foreground: string;
+  accent: string;
+};
 
 export type DemoCategory = { name: string; emoji: string; image_url?: string };
 export type DemoProduct = {
@@ -7,7 +20,7 @@ export type DemoProduct = {
   description: string;
   price: number;
   image_url: string;
-  category: string; // referencia DemoCategory.name
+  category: string;
   featured?: boolean;
 };
 export type DemoOffer = {
@@ -16,7 +29,7 @@ export type DemoOffer = {
   price: number;
   old_price: number;
   image_url: string;
-  product?: string; // referencia DemoProduct.name
+  product?: string;
 };
 
 export type DemoPreset = {
@@ -24,10 +37,10 @@ export type DemoPreset = {
   label: string;
   emoji: string;
   description: string;
+  theme: DemoTheme;
   settings: {
     store_name: string;
     tagline: string;
-    primary_color: string; // HSL "h s% l%"
     banner_url: string;
     logo_url?: string;
     hero_title: string;
@@ -42,16 +55,64 @@ export type DemoPreset = {
 const U = (id: string, w = 800) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=80`;
 
+// ----- TEMAS -----
+const themeAcai: DemoTheme = {
+  background: "270 30% 8%", foreground: "35 30% 96%",
+  card: "270 25% 12%", card_foreground: "35 30% 96%",
+  muted: "270 18% 15%", muted_foreground: "270 10% 65%",
+  border: "270 20% 20%",
+  primary: "280 75% 55%", primary_foreground: "0 0% 100%",
+  accent: "290 80% 65%",
+};
+
+const themeBurger: DemoTheme = {
+  // Preto + vermelho
+  background: "0 0% 7%", foreground: "0 0% 96%",
+  card: "0 0% 11%", card_foreground: "0 0% 96%",
+  muted: "0 0% 14%", muted_foreground: "0 0% 65%",
+  border: "0 0% 20%",
+  primary: "0 80% 50%", primary_foreground: "0 0% 100%",
+  accent: "16 90% 55%",
+};
+
+const themePizza: DemoTheme = {
+  // Creme quente + vermelho italiano
+  background: "40 50% 97%", foreground: "20 20% 12%",
+  card: "0 0% 100%", card_foreground: "20 20% 12%",
+  muted: "40 30% 92%", muted_foreground: "20 10% 40%",
+  border: "30 25% 85%",
+  primary: "0 75% 45%", primary_foreground: "0 0% 100%",
+  accent: "140 50% 35%",
+};
+
+const themePadaria: DemoTheme = {
+  // Branco + marrom
+  background: "0 0% 100%", foreground: "30 25% 12%",
+  card: "30 35% 98%", card_foreground: "30 25% 12%",
+  muted: "30 25% 94%", muted_foreground: "30 10% 40%",
+  border: "30 20% 88%",
+  primary: "30 65% 40%", primary_foreground: "0 0% 100%",
+  accent: "40 80% 55%",
+};
+
+const themeRestaurante: DemoTheme = {
+  // Verde escuro elegante
+  background: "150 20% 10%", foreground: "40 25% 95%",
+  card: "150 18% 14%", card_foreground: "40 25% 95%",
+  muted: "150 15% 18%", muted_foreground: "150 8% 65%",
+  border: "150 15% 22%",
+  primary: "150 50% 40%", primary_foreground: "0 0% 100%",
+  accent: "40 70% 55%",
+};
+
 export const DEMO_PRESETS: DemoPreset[] = [
   {
-    id: "hamburgueria",
-    label: "Hamburgueria",
-    emoji: "🍔",
-    description: "Burgers artesanais, batatas e refris.",
+    id: "hamburgueria", label: "Hamburgueria", emoji: "🍔",
+    description: "Burgers artesanais — preto + vermelho.",
+    theme: themeBurger,
     settings: {
       store_name: "Burger House",
       tagline: "Burgers artesanais na brasa",
-      primary_color: "16 90% 50%",
       banner_url: U("1568901346375-23c9450c58cd", 1600),
       hero_title: "Os melhores burgers da cidade",
       hero_subtitle: "Carne 180g, queijo derretido e pão brioche",
@@ -76,14 +137,12 @@ export const DEMO_PRESETS: DemoPreset[] = [
     ],
   },
   {
-    id: "pizzaria",
-    label: "Pizzaria",
-    emoji: "🍕",
-    description: "Pizzas artesanais forno a lenha.",
+    id: "pizzaria", label: "Pizzaria", emoji: "🍕",
+    description: "Pizzas artesanais — creme + vermelho italiano.",
+    theme: themePizza,
     settings: {
       store_name: "Bella Pizza",
       tagline: "Pizza italiana de forno a lenha",
-      primary_color: "0 75% 45%",
       banner_url: U("1513104890138-7c749659a591", 1600),
       hero_title: "Pizza fresquinha em 30 minutos",
       hero_subtitle: "Massa artesanal, ingredientes selecionados",
@@ -108,14 +167,12 @@ export const DEMO_PRESETS: DemoPreset[] = [
     ],
   },
   {
-    id: "padaria",
-    label: "Padaria",
-    emoji: "🥖",
-    description: "Pães, doces e café fresquinho.",
+    id: "padaria", label: "Padaria", emoji: "🥖",
+    description: "Pães e doces — branco + marrom.",
+    theme: themePadaria,
     settings: {
       store_name: "Padaria Central",
       tagline: "Pão fresquinho todo dia",
-      primary_color: "30 65% 45%",
       banner_url: U("1509440159596-0249088772ff", 1600),
       hero_title: "Pão quentinho na sua mesa",
       hero_subtitle: "Doces, salgados, café e muito mais",
@@ -141,14 +198,12 @@ export const DEMO_PRESETS: DemoPreset[] = [
     ],
   },
   {
-    id: "acai",
-    label: "Açaí",
-    emoji: "🍇",
-    description: "Açaí cremoso, vitaminas e picolés.",
+    id: "acai", label: "Açaí", emoji: "🍇",
+    description: "Açaí — roxo profundo.",
+    theme: themeAcai,
     settings: {
       store_name: "Roxo Açaí",
       tagline: "Açaí cremoso do jeito que você ama",
-      primary_color: "270 70% 45%",
       banner_url: U("1551024506-0bccd828d307", 1600),
       hero_title: "Açaí cremoso na sua porta",
       hero_subtitle: "Monte do seu jeito e receba em minutos",
@@ -172,14 +227,12 @@ export const DEMO_PRESETS: DemoPreset[] = [
     ],
   },
   {
-    id: "restaurante",
-    label: "Restaurante",
-    emoji: "🍽️",
-    description: "Pratos executivos e gourmet.",
+    id: "restaurante", label: "Restaurante", emoji: "🍽️",
+    description: "Cozinha contemporânea — verde elegante.",
+    theme: themeRestaurante,
     settings: {
       store_name: "Sabor & Arte",
       tagline: "Cozinha contemporânea",
-      primary_color: "150 50% 35%",
       banner_url: U("1414235077428-338989a2e8c0", 1600),
       hero_title: "Sabor que conquista",
       hero_subtitle: "Pratos executivos preparados na hora",
@@ -207,3 +260,37 @@ export const DEMO_PRESETS: DemoPreset[] = [
 ];
 
 export const DEFAULT_PRESET_ID = "acai";
+
+/** Aplica um tema ao :root via CSS variables. Não toca no admin (admin-scope tem seu próprio tema). */
+export function applyThemeVars(theme: Partial<DemoTheme> | null | undefined) {
+  if (!theme) return;
+  const root = document.documentElement;
+  const map: Record<keyof DemoTheme, string> = {
+    background: "--background",
+    foreground: "--foreground",
+    card: "--card",
+    card_foreground: "--card-foreground",
+    muted: "--muted",
+    muted_foreground: "--muted-foreground",
+    border: "--border",
+    primary: "--primary",
+    primary_foreground: "--primary-foreground",
+    accent: "--accent",
+  };
+  (Object.keys(map) as (keyof DemoTheme)[]).forEach((k) => {
+    const v = theme[k];
+    if (v) root.style.setProperty(map[k], v);
+  });
+  // Derivados úteis
+  if (theme.primary) {
+    root.style.setProperty("--ring", theme.primary);
+    root.style.setProperty("--accent", theme.accent ?? theme.primary);
+  }
+  if (theme.card) root.style.setProperty("--popover", theme.card);
+  if (theme.card_foreground) root.style.setProperty("--popover-foreground", theme.card_foreground);
+  if (theme.muted) {
+    root.style.setProperty("--secondary", theme.muted);
+    root.style.setProperty("--input", theme.muted);
+  }
+  if (theme.foreground) root.style.setProperty("--secondary-foreground", theme.foreground);
+}

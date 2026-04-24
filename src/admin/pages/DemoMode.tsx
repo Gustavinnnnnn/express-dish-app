@@ -100,7 +100,7 @@ export default function DemoMode() {
                     <div className="flex items-center gap-3">
                       <div
                         className="grid h-14 w-14 place-items-center rounded-2xl text-3xl shadow-sm"
-                        style={{ background: `hsl(${p.settings.primary_color} / 0.15)` }}
+                        style={{ background: `hsl(${p.theme.primary} / 0.15)` }}
                       >
                         {p.emoji}
                       </div>
@@ -111,13 +111,23 @@ export default function DemoMode() {
                     </div>
                     <p className="mt-3 text-sm text-admin-muted">{p.description}</p>
 
-                    <div className="mt-3 flex items-center gap-2">
-                      <div
+                    <div className="mt-3 flex items-center gap-1.5">
+                      <span
                         className="h-6 w-6 rounded-full border border-admin-border"
-                        style={{ background: `hsl(${p.settings.primary_color})` }}
+                        style={{ background: `hsl(${p.theme.background})` }}
+                        title="Fundo"
+                      />
+                      <span
+                        className="h-6 w-6 rounded-full border border-admin-border"
+                        style={{ background: `hsl(${p.theme.primary})` }}
                         title="Cor principal"
                       />
-                      <span className="text-xs text-admin-muted">
+                      <span
+                        className="h-6 w-6 rounded-full border border-admin-border"
+                        style={{ background: `hsl(${p.theme.accent})` }}
+                        title="Acento"
+                      />
+                      <span className="ml-2 text-xs text-admin-muted">
                         {p.categories.length} categorias · {p.products.length} produtos
                       </span>
                     </div>
