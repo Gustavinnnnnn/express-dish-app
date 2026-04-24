@@ -140,13 +140,15 @@ const OrderCard = ({ order }: { order: any }) => {
   );
 };
 
-const Field = ({ icon, placeholder, value, onChange }: {
-  icon: React.ReactNode; placeholder: string; value: string; onChange: (v: string) => void;
+const InfoRow = ({ icon, label, value }: {
+  icon: React.ReactNode; label: string; value: string;
 }) => (
   <div className="flex items-center gap-3 rounded-2xl bg-card px-4 py-3 shadow-soft">
     <span className="text-muted-foreground">{icon}</span>
-    <input value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-      className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground" />
+    <div className="min-w-0 flex-1">
+      <p className="text-[10px] uppercase tracking-wide text-muted-foreground">{label}</p>
+      <p className="truncate text-sm font-medium">{value || <span className="text-muted-foreground">—</span>}</p>
+    </div>
   </div>
 );
 
