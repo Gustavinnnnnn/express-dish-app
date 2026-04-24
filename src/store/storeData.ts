@@ -19,6 +19,9 @@ export type DbSettings = {
   primary_color: string; whatsapp: string | null; address: string | null;
   default_message: string | null; hero_title: string | null; hero_subtitle: string | null;
   hours: Record<string, string>; payment_methods: string[];
+  payment_mode?: "whatsapp" | "online";
+  mp_public_key?: string | null;
+  mp_environment?: "sandbox" | "production";
 };
 
 /** Compat shim — front-end antigo espera "image" e "category" string */
