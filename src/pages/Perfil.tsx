@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 
 const Perfil = () => {
   const profile = useProfile();
-  const setProfile = useProfile((s) => s.set);
   const { settings } = useStoreData();
   const [orders, setOrders] = useState<any[]>([]);
 
