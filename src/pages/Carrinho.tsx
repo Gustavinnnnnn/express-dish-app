@@ -3,11 +3,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Link } from "react-router-dom";
 import { AppShell } from "@/components/AppShell";
 import { useCart, useProfile } from "@/store/cart";
+import { useAuth } from "@/hooks/useAuth";
 import { brl } from "@/lib/format";
 import { useStoreData } from "@/store/storeData";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const Carrinho = () => {
   const { settings } = useStoreData();
@@ -25,7 +26,20 @@ const Carrinho = () => {
   const profile = useProfile();
   const setProfile = useProfile((s) => s.set);
   const addOrder = useProfile((s) => s.addOrder);
+  const { user, profile: authProfile, updateProfile } = useAuth();
   const [processing, setProcessing] = useState(false);
+
+  // Pré-preenche do perfil autenticado quando disponível
+  useEffect(() => {
+    if (authProfile) {
+      setProfile({
+        name: authProfile.name || profile.name,
+        phone: authProfile.phone || profile.phone,
+        address: authProfile.address || profile.address,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authProfile?.id]);
 
   const paymentLabel = {
     pix: "Pix",
