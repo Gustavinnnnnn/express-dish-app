@@ -69,7 +69,7 @@ export default function AdminProducts() {
                   <td>
                     <div className="flex items-center justify-end gap-1">
                       <button className="admin-btn admin-btn-ghost" onClick={() => setEditing(p)}><Pencil className="size-4" /></button>
-                      <button className="admin-btn admin-btn-ghost text-red-500" onClick={() => remove(p.id)}><Trash2 className="size-4" /></button>
+                      <button className="admin-btn admin-btn-danger" onClick={() => remove(p.id)}><Trash2 className="size-4" /></button>
                     </div>
                   </td>
                 </tr>
