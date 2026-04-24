@@ -61,6 +61,45 @@ const Explorar = () => {
         ))}
       </div>
 
+      {/* Ofertas em destaque */}
+      {offers.length > 0 && active === "all" && !query && (
+        <section className="mt-5 px-5">
+          <div className="mb-2 flex items-center gap-1.5">
+            <Tag className="h-4 w-4 text-primary" />
+            <h3 className="font-display text-sm font-bold uppercase tracking-wide text-primary">Ofertas</h3>
+          </div>
+          <div className="no-scrollbar -mx-5 flex gap-3 overflow-x-auto px-5 pb-1">
+            {offers.slice(0, 6).map((o) => (
+              <Link
+                key={o.id}
+                to={o.product_id ? `/produto/${o.product_id}` : "/ofertas"}
+                className="relative flex w-48 flex-shrink-0 flex-col overflow-hidden rounded-2xl bg-gradient-card shadow-card"
+              >
+                <div className="relative h-24 w-full bg-card">
+                  {o.image_url ? (
+                    <img src={o.image_url} alt={o.title} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-2xl">🏷️</div>
+                  )}
+                  <span className="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[10px] font-bold uppercase text-primary-foreground shadow-glow">
+                    Oferta
+                  </span>
+                </div>
+                <div className="p-2.5">
+                  <p className="font-display text-xs font-bold leading-tight line-clamp-1">{o.title}</p>
+                  <div className="mt-1 flex items-baseline gap-1.5">
+                    <span className="font-display text-sm font-extrabold text-primary">{brl(Number(o.price))}</span>
+                    {o.old_price && Number(o.old_price) > Number(o.price) && (
+                      <span className="text-[10px] text-muted-foreground line-through">{brl(Number(o.old_price))}</span>
+                    )}
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
+
       <section className="mt-5 flex flex-col gap-3 px-5">
         {loading && <p className="py-10 text-center text-sm text-muted-foreground">Carregando...</p>}
         {!loading && list.length === 0 && (
