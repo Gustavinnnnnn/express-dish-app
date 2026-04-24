@@ -50,46 +50,46 @@ export default function AdminDashboard() {
 
   return (
     <AdminLayout title="Dashboard">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+      <div className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4 lg:gap-5">
         {cards.map((c) => (
-          <div key={c.label} className="admin-card p-4 lg:p-5">
-            <div className="flex items-center gap-3">
-              <div className="grid size-10 place-items-center rounded-xl" style={{ background: `${c.tone.replace(")", " / 0.12)")}`, color: c.tone }}>
-                <c.icon className="size-5" />
+          <div key={c.label} className="admin-card p-3 sm:p-4 lg:p-5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="grid size-9 shrink-0 place-items-center rounded-xl sm:size-10" style={{ background: `${c.tone.replace(")", " / 0.12)")}`, color: c.tone }}>
+                <c.icon className="size-4 sm:size-5" />
               </div>
               <div className="min-w-0">
-                <p className="truncate text-xs text-admin-muted">{c.label}</p>
-                <p className="truncate font-display text-xl font-semibold lg:text-2xl">{c.value}</p>
+                <p className="truncate text-[11px] text-admin-muted sm:text-xs">{c.label}</p>
+                <p className="truncate font-display text-base font-semibold sm:text-xl lg:text-2xl">{c.value}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="mt-6 grid gap-5 lg:grid-cols-3">
-        <div className="admin-card p-5 lg:col-span-2">
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold">Pedidos nos últimos 7 dias</h3>
+      <div className="mt-4 grid gap-3 sm:mt-6 sm:gap-5 lg:grid-cols-3">
+        <div className="admin-card p-3 sm:p-5 lg:col-span-2">
+          <div className="mb-3 flex items-center justify-between sm:mb-4">
+            <h3 className="text-sm font-semibold sm:text-base">Pedidos · últimos 7 dias</h3>
           </div>
-          <div className="h-64">
+          <div className="h-48 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chart}>
+              <LineChart data={chart} margin={{ top: 5, right: 8, bottom: 0, left: -20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--admin-border))" />
-                <XAxis dataKey="day" stroke="hsl(var(--admin-muted))" fontSize={12} />
-                <YAxis stroke="hsl(var(--admin-muted))" fontSize={12} allowDecimals={false} />
-                <Tooltip contentStyle={{ background: "hsl(var(--admin-card))", color: "hsl(var(--admin-fg))", border: "1px solid hsl(var(--admin-border))", borderRadius: 10 }} />
-                <Line type="monotone" dataKey="pedidos" stroke="hsl(var(--admin-primary))" strokeWidth={2.5} dot={{ r: 4 }} />
+                <XAxis dataKey="day" stroke="hsl(var(--admin-muted))" fontSize={11} />
+                <YAxis stroke="hsl(var(--admin-muted))" fontSize={11} allowDecimals={false} width={28} />
+                <Tooltip contentStyle={{ background: "hsl(var(--admin-card))", color: "hsl(var(--admin-fg))", border: "1px solid hsl(var(--admin-border))", borderRadius: 10, fontSize: 12 }} />
+                <Line type="monotone" dataKey="pedidos" stroke="hsl(var(--admin-primary))" strokeWidth={2.5} dot={{ r: 3 }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="admin-card p-5">
-          <h3 className="mb-4 font-semibold">Mais vendidos</h3>
+        <div className="admin-card p-3 sm:p-5">
+          <h3 className="mb-3 text-sm font-semibold sm:mb-4 sm:text-base">Mais vendidos</h3>
           {top.length === 0 ? (
             <p className="text-sm text-admin-muted">Nenhuma venda ainda.</p>
           ) : (
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {top.map((t, i) => (
                 <li key={t.name} className="flex items-center gap-3">
                   <span className="grid size-7 place-items-center rounded-md bg-admin-soft text-xs font-semibold">{i + 1}</span>

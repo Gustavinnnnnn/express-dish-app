@@ -107,5 +107,24 @@
   }
 
   .admin-scope .admin-table { min-width: 720px; }
+
+  /* Inputs maiores no mobile pra evitar zoom no iOS */
+  .admin-scope .admin-input,
+  .admin-scope .admin-textarea {
+    font-size: 16px;
+    height: 44px;
+  }
+  .admin-scope .admin-textarea { height: auto; min-height: 96px; }
+
+  /* Botões com toque maior */
+  .admin-scope .admin-btn { height: 42px; padding: 0 14px; }
+
+  /* Drawer ocupa toda a tela no mobile */
+  .admin-scope .fixed.inset-0 .max-w-lg { max-width: 100%; }
 }
+
+/* Scrollbar mais discreto no admin */
+.admin-scope ::-webkit-scrollbar { width: 8px; height: 8px; }
+.admin-scope ::-webkit-scrollbar-thumb { background: hsl(var(--admin-border)); border-radius: 4px; }
+.admin-scope ::-webkit-scrollbar-thumb:hover { background: hsl(var(--admin-primary) / 0.6); }
 
